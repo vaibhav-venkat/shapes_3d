@@ -1,13 +1,5 @@
 import numpy as np
 
-# A1 = 25
-# C1 = 1.5 * A1
-# A2 = 40
-# C2 = 2 * A2
-# D1 = 1
-# D2 = 0.25
-# FILENAME = "./out/ellipsoid.txt"
-
 
 class Ellipsoid:
     def __init__(

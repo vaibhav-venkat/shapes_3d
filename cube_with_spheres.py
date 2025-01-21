@@ -43,9 +43,9 @@ def gen_points_faiss(
     nlist = 100  # Clusters
     quantizer = faiss.IndexFlatL2(dim)
     index = faiss.IndexIVFFlat(quantizer, dim, nlist)
-    training_data = np.random.uniform(min_val, max_val, size=(3900, 3)).astype(
-        "float32"
-    )
+    training_data = np.random.uniform(
+        min_val, max_val, size=(int(180 * np.sqrt(N)), 3)
+    ).astype("float32")
     index.train(training_data)
 
     # index = faiss.IndexHNSWFlat(dim, 20)
