@@ -20,7 +20,7 @@ def save_coords(points, filename="out.txt"):
     """
     Save coordinates to a file
     """
-    np.savetxt(filename, points, fmt="%.2f", delimiter=" ", header="X Y Z")
+    np.savetxt(filename, points, fmt="%.3f")
 
 
 # TODO: make dist dynamic based on R_outer
@@ -119,13 +119,11 @@ for i in range(N):
         shell_pts.append(p)
 core_pts = np.array(core_pts)
 shell_pts = np.array(shell_pts)
-
 print("TIME (sec)", time.time() - start)
 
 append = "faiss"
 save_coords(core_pts, f"out/core_out_{append}.txt")
 save_coords(shell_pts, f"out/shell_out_{append}.txt")
-
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection="3d")
 #
