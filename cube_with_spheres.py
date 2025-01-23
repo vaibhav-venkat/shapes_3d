@@ -1,10 +1,7 @@
 import numpy as np
-import faiss  # NOTE: This can run on Nvidia GPU's with faiss_gpu package
+import faiss
 import time
 from ellipsoid import Ellipsoid
-
-# import matplotlib.pyplot as plt
-# from mpl_toolkits.mplot3d import Axes3D
 
 L = 1000  # Length
 R_OM = 30.0  # Outer radius mean
@@ -15,12 +12,15 @@ VOL_FR = 0.1  # Volume Fraction, dimensions L^(-3)
 D1 = 0.1  # Density of core, in points per unit volume
 D2 = 0.05  # Density of shell, in points per unit volume.
 
+TS_M = R_OM - R_IM  # shell thickness mean
+TS_S = np.sqrt(R_OS**2 - R_IS**2)  # quadrature standard deviation of shell thickness
+
 
 def save_coords(points, filename="out.txt"):
     """
     Save coordinates to a file
     """
-    np.savetxt(filename, points, fmt="%.3f")
+    np.savetxt(filename, points, fmt="%.4f")
 
 
 # TODO: make dist dynamic based on R_outer
@@ -40,11 +40,11 @@ def gen_points_faiss(
     n_batch -- the number of points to generate per batch
     """
     dim = 3
-    nlist = 100  # Clusters
+    nlist = 400  # Clusters
     quantizer = faiss.IndexFlatL2(dim)
     index = faiss.IndexIVFFlat(quantizer, dim, nlist)
     training_data = np.random.uniform(
-        min_val, max_val, size=(int(180 * np.sqrt(N)), 3)
+        min_val, max_val, size=(int(2000 * np.sqrt(N)), 3)
     ).astype("float32")
     index.train(training_data)
 
@@ -80,29 +80,31 @@ def gen_points_faiss(
 start = time.time()
 # https://en.wikipedia.org/wiki/Log-normal_distribution
 # Generate each radius to be used for the spheres
-sigma_o = np.sqrt(np.log(1 + (R_OS / R_OM) ** 2))
-mu_o = np.log(R_OM) - sigma_o**2 / 2
-
+sigma_ts = np.sqrt(np.log(1 + (TS_S / TS_M) ** 2))
+mu_ts = np.log(TS_M) - sigma_ts**2 / 2
+sigma_i = np.sqrt(np.log(1 + (R_IS / R_IM) ** 2))
+mu_i = np.log(R_IM) - sigma_i**2 / 2
 R_outer = []
+R_inner = []
 sum_vol = 0
 tgt = (L**3) * VOL_FR
 while sum_vol < tgt:
-    r = np.random.lognormal(mu_o, sigma_o)
-    vol = (4 / 3) * np.pi * (r**3)
+    thickness = np.random.lognormal(mu_ts, sigma_ts)
+    ri = np.random.lognormal(mu_i, sigma_i)
+    ro = thickness + ri
+    vol = (4 / 3) * np.pi * ((ro**3))
     if sum_vol + vol > tgt:
         break
-    sum_vol += (4 / 3) * np.pi * (r**3)
-    R_outer.append(r)
+    sum_vol += vol
+    R_outer.append(ro)
+    R_inner.append(ri)
 R_outer = np.array(R_outer)
-
-# Every sphere has one inner and one outer radius
-N = R_outer.shape[0]  # Number of spheres
-sigma_i = np.sqrt(np.log(1 + (R_IS / R_IM) ** 2))
-mu_i = np.log(R_IM) - sigma_i**2 / 2
-R_inner = np.random.lognormal(mu_i, sigma_i, N)
-
-
+R_inner = np.array(R_inner)
+N = R_outer.shape[0]
+print("R_o > R_i:", np.all(R_outer - R_inner) > 0)
 max_r = np.max(R_outer)
+print("N (particles):", N)
+print("Max diameter of sphere", 2 * max_r)
 # Each point must be a diameter away.
 # Each point must be within [-L/2 + max(R), L/2 - max(R)]^3
 centers = gen_points_faiss(N, -L / 2 + max_r, L / 2 - max_r, 2 * max_r)
@@ -124,12 +126,3 @@ print("TIME (sec)", time.time() - start)
 append = "faiss"
 save_coords(core_pts, f"out/core_out_{append}.txt")
 save_coords(shell_pts, f"out/shell_out_{append}.txt")
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection="3d")
-#
-# # Scatter plot the data
-# ax.scatter(shell_pts[:, 0], shell_pts[:, 1], shell_pts[:, 2])
-#
-#
-# # Save the plot as an image
-# plt.savefig("core.png")
