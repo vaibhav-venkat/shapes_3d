@@ -1,7 +1,9 @@
 import numpy as np
 
-
 class Ellipsoid:
+    """
+    Use for generating a uniform distribution of points on an ellipsoid
+    """
     def __init__(
         self,
         density: float,
