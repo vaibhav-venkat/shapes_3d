@@ -16,6 +16,21 @@ TS_M = R_OM - R_IM  # shell thickness mean
 TS_S = np.sqrt(R_OS**2 - R_IS**2)  # quadrature standard deviation of shell thickness
 
 
+def save_dump(points, filename="out.dump", box_len=1000):
+    num = sum(pt.shape[0] for pt in points)
+    with open(filename, "w") as f:
+        f.write("ITEM: TIMESTEP\n0\n")
+        f.write(f"ITEM: NUMBER OF ATOMS\n{num}\n")
+        f.write(
+            f"ITEM: BOX BOUNDS pp pp pp\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n{-box_len//2} {box_len//2}\n"
+        )
+        f.write("ITEM: ATOMS id type x y z\n")
+        for i in range(0, len(points)):
+            for j, (x, y, z) in enumerate(points[i], start=1):
+                f.write(f"{j} {i + 1} {x:.6f} {y:.6f} {z:.6f}\n")
+        print("dumped")
+
+
 def save_coords(points, filename="out.txt"):
     """
     Save coordinates to a file
@@ -122,7 +137,7 @@ for i in range(N):
 core_pts = np.array(core_pts)
 shell_pts = np.array(shell_pts)
 print("TIME (sec)", time.time() - start)
-
 append = "faiss"
 save_coords(core_pts, f"out/core_out_{append}.txt")
 save_coords(shell_pts, f"out/shell_out_{append}.txt")
+save_dump([core_pts, shell_pts], f"out/all_out_{append}.dump")
