@@ -67,3 +67,10 @@ for training data and optimization to make it faster.
 The training data is recommended to be `120 * sqrt(N)` to `4096 * sqrt(N)` of size
 
 Thus, is clusters and finds the nearest neighbors efficiently
+
+
+## Visualizing *.dump files
+
+1. Download [Ovito](https://www.ovito.org/#download) for your specific OS
+2. Simply open the dump file within the software
+3. It should show the plots of all objects, as specified in the dump file
