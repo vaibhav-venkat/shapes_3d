@@ -16,10 +16,12 @@ class Onion:
         pts = []
         curr_radius: float = 0
         i: int = 0
-        for r in self.radii:
+        for i in range(len(self.radii)):
             # create a new shell with the provided thickness, centered
-            curr_shell : np.ndarray= Ellipsoid(self.density[i], curr_radius + r, curr_radius).make_obj() + self.center
+            curr_shell : list = (Ellipsoid(float(self.density[i]), curr_radius + self.radii[i], curr_radius).make_obj() + self.center).tolist()
+            for row in curr_shell:
+                row.append(i+1)
             pts.extend(curr_shell)
-            curr_radius += r
+            curr_radius += self.radii[i]
             i += 1
         return np.array(pts)

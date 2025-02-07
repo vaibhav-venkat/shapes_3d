@@ -33,7 +33,7 @@ class Ellipsoid:
         else:
             self.c_i = c_i
 
-    def make_obj(self):
+    def make_obj(self) -> np.ndarray:
         """
         Make the points with the given self properties (uniformly)
         """
