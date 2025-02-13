@@ -110,15 +110,17 @@ def save_dump(points, filename="out/patches.dump", box_len=1000):
             f"ITEM: BOX BOUNDS pp pp pp\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n{-box_len//2} {box_len//2}\n"
         )
         f.write("ITEM: ATOMS id type x y z\n")
+        max_type = 0
         for i in range(0, len(points)):
             if points[i].shape[1] == 4:
                 for j in range(points[i].shape[0]):
                     f.write(
                         f"{j + 1} {int(points[i][j][3] + i)} {points[i][j][0]:.6f} {points[i][j][1]:.6f} {points[i][j][2]:.6f}\n"
                     )
+                    max_type = max(max_type, int(points[i][j][3]))
             else:
                 for j, (x, y, z) in enumerate(points[i], start=1):
-                    f.write(f"{j} {i + 1} {x:.6f} {y:.6f} {z:.6f}\n")
+                    f.write(f"{j} {i + 1 + max_type} {x:.6f} {y:.6f} {z:.6f}\n")
         print("dumped to", filename)
 
 
