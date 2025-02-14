@@ -29,61 +29,47 @@ radii: np.ndarray = np.array(radii_list)
 N: int = radii.shape[0]
 
 
-def gen_points_faiss(
-    n_pts: int, min_val: float, max_val: float, dist: float, n_batch: int = 100
-) -> np.ndarray:
-    """
-    Generate points with minimum distance using Faiss and batching.
-
-    Params:
-    n_pts -- number of points
-    min_val -- the minmum value on the interval
-    max_al -- the maximum value on the interval
-    dist -- the minimum distance between each R^3 point
-    n_batch -- the number of points to generate per batch
-    """
-    dim = 3
-    nlist = 400  # Clusters
-    quantizer = faiss.IndexFlatL2(dim)
-    index = faiss.IndexIVFFlat(quantizer, dim, nlist)
-    training_data = np.random.uniform(
-        min_val, max_val, size=(int(2000 * np.sqrt(N)), 3)
-    ).astype("float32")
-    index.train(training_data)
-
-    # index = faiss.IndexHNSWFlat(dim, 20)
-
-    pts = []
-    i = 0
-
-    while i < n_pts:
-        remaining = n_pts - i
-        current_batch_size = min(n_batch, remaining)
-
-        # Generate a batch of candidate points
-        batch = np.random.uniform(
-            min_val, max_val, size=(current_batch_size, dim)
-        ).astype("float32")
-
-        if i > 0:
-            # Neighboring points
-            D, _ = index.search(batch, 1)
-            valid = np.sqrt(D[:, 0]) >= dist  # Check distances
-            valid_points = batch[valid]
-        else:
-            valid_points = batch
-
-        index.add(valid_points)
-        pts.extend(valid_points)
-        i += valid_points.shape[0]
-        if valid_points.shape[0]:
-            print(i, "out of", N)
-
-    return np.array(pts[:n_pts])
+def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarray:
+    # divide the box into equal size
+    num_cells: int = int(np.floor((max_pt - min_pt) / min_L))
+    cell_size: float = (max_pt - min_pt) / num_cells
+    grid = [
+        [[[] for _ in range(num_cells)] for _ in range(num_cells)]
+        for _ in range(num_cells)
+    ]  # (x, y, z)
+    pts: np.ndarray = np.zeros((N, 3))
+    num_pts: int = 0
+    while num_pts < N:
+        # random point
+        R: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
+        x_c: int = int((R[0] - min_pt) // cell_size)
+        y_c: int = int((R[1] - min_pt) // cell_size)
+        z_c: int = int((R[2] - min_pt) // cell_size)
+        good = True
+        min_x_rng = 0 if x_c == 0 else -1
+        max_x_rng = 0 if x_c == (num_cells - 1) else 1
+        for i in range(min_x_rng, max_x_rng):
+            min_y_rng = 0 if y_c == 0 else -1
+            max_y_rng = 0 if y_c == (num_cells - 1) else 1
+            for j in range(min_y_rng, max_y_rng):
+                min_z_rng = 0 if z_c == 0 else -1
+                max_z_rng = 0 if z_c == (num_cells - 1) else 1
+                for k in range(min_z_rng, max_z_rng):
+                    for a in range(len(grid[x_c + i][y_c + j][z_c + k])):
+                        r1: np.ndarray = grid[x_c + i][y_c + j][z_c + k][a]
+                        dist = np.linalg.norm(r1 - R)
+                        if dist <= min_L:
+                            good = False
+                            break
+        if good:
+            grid[x_c][y_c][z_c].append(R)
+            pts[num_pts] = R
+            num_pts += 1
+    return pts
 
 
 max_r: float = np.max(radii.sum(axis=1))
-centers = gen_points_faiss(N, -L / 2 + max_r, L / 2 - max_r, 2 * max_r)
+centers = make_centers(N, max_r, L - max_r, 2 * max_r) - L / 2
 onion_list = []
 patch_list = []
 for i in range(N):
