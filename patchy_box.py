@@ -2,6 +2,7 @@ from patch_onion import PatchOnion
 import numpy as np
 import faiss
 from pathlib import Path
+from spaced_grid import SpacedGrid
 
 ts: np.ndarray = np.array([10.0, 7.0, 6.0, 5.0, 4.0])
 std_ts: np.ndarray = np.array([1.5, 1.2, 0.5, 0.8, 1.0])
@@ -30,39 +31,16 @@ N: int = radii.shape[0]
 
 
 def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarray:
-    # divide the box into equal size
-    num_cells: int = int(np.floor((max_pt - min_pt) / min_L))
-    cell_size: float = (max_pt - min_pt) / num_cells
-    grid = [
-        [[[] for _ in range(num_cells)] for _ in range(num_cells)]
-        for _ in range(num_cells)
-    ]  # (x, y, z)
+    grid = SpacedGrid(min_pt, max_pt, min_L)
+    grid.construct()
     pts: np.ndarray = np.zeros((N, 3))
     num_pts: int = 0
     while num_pts < N:
         # random point
         R: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
-        x_c: int = int((R[0] - min_pt) // cell_size)
-        y_c: int = int((R[1] - min_pt) // cell_size)
-        z_c: int = int((R[2] - min_pt) // cell_size)
-        good = True
-        min_x_rng = 0 if x_c == 0 else -1
-        max_x_rng = 0 if x_c == (num_cells - 1) else 1
-        for i in range(min_x_rng, max_x_rng):
-            min_y_rng = 0 if y_c == 0 else -1
-            max_y_rng = 0 if y_c == (num_cells - 1) else 1
-            for j in range(min_y_rng, max_y_rng):
-                min_z_rng = 0 if z_c == 0 else -1
-                max_z_rng = 0 if z_c == (num_cells - 1) else 1
-                for k in range(min_z_rng, max_z_rng):
-                    for a in range(len(grid[x_c + i][y_c + j][z_c + k])):
-                        r1: np.ndarray = grid[x_c + i][y_c + j][z_c + k][a]
-                        dist = np.linalg.norm(r1 - R)
-                        if dist <= min_L:
-                            good = False
-                            break
-        if good:
-            grid[x_c][y_c][z_c].append(R)
+        if not grid.overlap(R):
+            i, j, k = grid.get_cell(R)
+            grid.add(i, j, k, R)
             pts[num_pts] = R
             num_pts += 1
     return pts
