@@ -46,13 +46,13 @@ class SpacedGrid:
         x_c, y_c, z_c = self.get_cell(r)
         min_x_rng = 0 if x_c == 0 else -1
         max_x_rng = 0 if x_c == (self.num_cells - 1) else 1
-        for i in range(min_x_rng, max_x_rng):
+        for i in range(min_x_rng, max_x_rng + 1):
             min_y_rng = 0 if y_c == 0 else -1
             max_y_rng = 0 if y_c == (self.num_cells - 1) else 1
-            for j in range(min_y_rng, max_y_rng):
+            for j in range(min_y_rng, max_y_rng + 1):
                 min_z_rng = 0 if z_c == 0 else -1
                 max_z_rng = 0 if z_c == (self.num_cells - 1) else 1
-                for k in range(min_z_rng, max_z_rng):
+                for k in range(min_z_rng, max_z_rng + 1):
                     for a in range(len(self.grid[x_c + i][y_c + j][z_c + k])):
                         r1: np.ndarray = self.grid[x_c + i][y_c + j][z_c + k][a]
                         dist = np.linalg.norm(r1 - r)
