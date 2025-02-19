@@ -3,10 +3,11 @@ from scipy.spatial.transform import Rotation as Rot
 
 
 class PatchShell:
-    def __init__(self, R: float, Y: float | np.ndarray, X: int):
+    def __init__(self, R: float, Y: float | np.ndarray, X: int, D: float):
         self.R = R
         self.Y = Y
         self.X = X
+        self.D = D
 
     def gen_centers(self) -> np.ndarray:
         """
@@ -20,13 +21,11 @@ class PatchShell:
         idx: np.ndarray = np.arange(0, self.X, dtype=float) + 0.5
         # theta is the polar angle, and phi is the azimuthal
         theta: np.ndarray = np.arccos(1 - 2 * idx / self.X)
-        phi: np.ndarray = 2 * np.pi * gold * idx
+        phi: np.ndarray = 2 * np.pi * idx / gold
         centers: np.ndarray = np.column_stack((np.full(self.X, self.R), theta, phi))
         return centers
 
-    def make_circle(
-        self, Y_i: float, p_i: float, a_i: float, res_mult: float = 1.5
-    ) -> np.ndarray:
+    def make_circle(self, Y_i: float, p_i: float, a_i: float) -> np.ndarray:
         """
         Make a circle on the current sphere with the given patch size
 
@@ -34,22 +33,21 @@ class PatchShell:
         p_i: float - The polar angle of the center of the circle
         a_i: float - The azimuthal angle of the center of the circle
         """
-        res: float = res_mult * Y_i
+        n_pts: int = int(np.sqrt(self.D * Y_i))
         # Using area of circle on sphere (with integration)
         P = Y_i / (2 * np.pi * self.R**2)
         # Arc length (diameter equivalent) of each sphere
         L: float = self.R * np.arccos(1 - P)
         polar_change: float = L / self.R
         # NOTE: it is sqrt of res because the loop runs twice (Might fix later)
-        polar_inc: float = polar_change / (np.sqrt(res) - 1)
         patch = []
-        for p in range(int(np.sqrt(res))):
+        v = np.random.uniform(0, 1, n_pts)
+        for v_0 in v:
             # -change/ 2 because each circle has its "top" behind the center
-            polar = p * polar_inc - polar_change / 2
-
-            for a in range(int(np.sqrt(res))):
-                az_inc = 2 * np.pi / (int(np.sqrt(res)))
-                azi = a * az_inc
+            polar = np.arccos(1 - v_0 * (1 - np.cos(polar_change / 2)))
+            u = np.random.uniform(0, 1, n_pts)
+            for a in u:
+                azi = 2 * np.pi * a
                 pos: np.ndarray = self.R * np.array(
                     [
                         [np.cos(azi) * np.sin(polar)],

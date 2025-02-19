@@ -11,10 +11,11 @@ class PatchOnion:
         density: np.ndarray,
         Y: float | np.ndarray,
         X: int,
+        patch_den: float,
     ):
         self.onion = Onion(radii, center, density)
 
-        self.patch_obj = PatchShell(np.sum(radii), Y, X)
+        self.patch_obj = PatchShell(np.sum(radii), Y, X, patch_den)
 
     def onion_base(self) -> np.ndarray:
         return self.onion.pts
