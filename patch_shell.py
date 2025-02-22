@@ -73,11 +73,6 @@ class PatchShell:
                 )
                 pos1 = rot1.apply(pos)
                 fin_pos = rot2.apply(pos1)
-                rot = Rot.from_rotvec([0, p_i, 0])
-                pos = rot.apply(pos)
-
-                rot = Rot.from_rotvec([0, 0, a_i])
-                pos = rot.apply(pos)
                 patch.append(fin_pos)
         return np.array(patch)
 
