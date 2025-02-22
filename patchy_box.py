@@ -8,7 +8,7 @@ std_ts: np.ndarray = np.array([1.5, 1.2, 0.5, 0.8, 1.0])
 density = np.array([0.0, 0.05, 0.1, 0.03, 0.2])
 L: float = 800
 VOL_FR: float = 0.15
-patch_den: float = 0.7
+patch_den: float = 0.3
 Y: np.ndarray = np.array([300.0, 200.0, 900.0, 1500.0, 200.0, 3000.0])
 X: int = 6
 

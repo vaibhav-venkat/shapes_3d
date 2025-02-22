@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
+from scipy.stats import qmc
 
 
 class PatchShell:
@@ -41,9 +42,11 @@ class PatchShell:
         polar_change: float = L / self.R
         # NOTE: it is sqrt of res because the loop runs twice (Might fix later)
         patch = []
-        v = np.random.uniform(0, 1, n_pts)
+        sampler = qmc.Sobol(d=2, scramble=True)
+        sampler = sampler.random(int(2 ** (np.ceil(np.log2(n_pts)))))
+        v = sampler[:, 0]
+        u = sampler[:, 1]
         for v_0 in v:
-            # -change/ 2 because each circle has its "top" behind the center
             polar = np.arccos(1 - v_0 * (1 - np.cos(polar_change / 2)))
             u = np.random.uniform(0, 1, n_pts)
             for a in u:
@@ -91,4 +94,6 @@ class PatchShell:
                 Y_i = self.Y
             patch: np.ndarray = self.make_circle(Y_i, p_i, a_i)
             patches.extend(patch)
-        return np.array(patches)
+        rand_rot = Rot.from_quat(np.random.uniform(0, 1, size=4))
+        fin_patches: np.ndarray = rand_rot.apply(patches)
+        return np.array(fin_patches)
