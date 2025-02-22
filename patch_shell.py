@@ -50,20 +50,35 @@ class PatchShell:
                 azi = 2 * np.pi * a
                 pos: np.ndarray = self.R * np.array(
                     [
-                        [np.cos(azi) * np.sin(polar)],
-                        [np.sin(azi) * np.sin(polar)],
-                        [np.cos(polar)],
+                        np.cos(azi) * np.sin(polar),
+                        np.sin(azi) * np.sin(polar),
+                        np.cos(polar),
                     ]
                 )
-                # Rotate it along the Y (by the polar angle)
-                rot: np.ndarray = np.array(Rot.from_rotvec([0, p_i, 0]).as_matrix())
-                pos = rot @ pos
+                rot1 = Rot.from_quat(
+                    [
+                        0,
+                        np.sin(p_i / 2),
+                        0,
+                        np.cos(p_i / 2),
+                    ],
+                )
+                rot2 = Rot.from_quat(
+                    [
+                        0,
+                        0,
+                        np.sin(a_i / 2),
+                        np.cos(a_i / 2),
+                    ]
+                )
+                pos1 = rot1.apply(pos)
+                fin_pos = rot2.apply(pos1)
+                rot = Rot.from_rotvec([0, p_i, 0])
+                pos = rot.apply(pos)
 
-                # NOTE: We must rotate it again, as before it was on the z axis
-                # Rotate it so that the azimuthal angle matches
-                rot: np.ndarray = np.array(Rot.from_rotvec([0, 0, a_i]).as_matrix())
-                pos = rot @ pos
-                patch.append([pos[0][0], pos[1][0], pos[2][0]])
+                rot = Rot.from_rotvec([0, 0, a_i])
+                pos = rot.apply(pos)
+                patch.append(fin_pos)
         return np.array(patch)
 
     def make_patches(self) -> np.ndarray:

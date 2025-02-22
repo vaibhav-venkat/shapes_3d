@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 sphere = Onion(np.array([50, 20]), np.array([[0, 0, 0]]), np.array([1])).pts
-patches = PatchShell(50, np.array([300.0, 200.0, 900.0, 1500.0, 200.0, 3000.0]), 6)
+patches = PatchShell(50, np.array([300.0, 200.0, 900.0, 1500.0, 200.0, 3000.0]), 6, 1.6)
 pts = patches.make_patches()
 
 
