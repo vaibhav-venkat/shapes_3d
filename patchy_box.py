@@ -1,13 +1,12 @@
 from patch_onion import PatchOnion
 import numpy as np
 from pathlib import Path
-from spaced_grid import SpacedGrid
 
 ts: np.ndarray = np.array([10.0, 7.0, 6.0, 5.0, 4.0])
 std_ts: np.ndarray = np.array([1.5, 1.2, 0.5, 0.8, 1.0])
 density = np.array([0.0, 0.05, 0.1, 0.03, 0.2])
 L: float = 800
-VOL_FR: float = 0.15
+VOL_FR: float = 0.05
 patch_den: float = 0.3
 Y: np.ndarray = np.array([300.0, 200.0, 900.0, 1500.0, 200.0, 3000.0])
 X: int = 6
@@ -31,25 +30,30 @@ N: int = radii.shape[0]
 
 
 def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarray:
-    grid = SpacedGrid(min_pt, max_pt, min_L)
-    grid.construct()
     pts: np.ndarray = np.zeros((N, 3))
     num_pts: int = 0
     while num_pts < N:
         # random point
         R: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
-        if not grid.overlap(R):
-            i, j, k = grid.get_cell(R)
-            grid.add(i, j, k, R)
+        good = True
+        for p in pts:
+            if np.linalg.norm(R - p) <= min_L:
+                good = False
+                break
+        if good:
             pts[num_pts] = R
             num_pts += 1
+            if num_pts == 0 or (num_pts + 1) % 50 == 0 or num_pts == N - 1:
+                print("Made center n =", num_pts + 1, "out of", N)
     return pts
 
 
 max_r: float = np.max(radii.sum(axis=1))
-centers = make_centers(N, max_r, L - max_r, 2 * max_r) - L / 2
+print("making the centers")
+centers = make_centers(N, -L / 2 + max_r, L / 2 - max_r, 2 * max_r)
 onion_list = []
 patch_list = []
+print("making the patches and shells")
 for i in range(N):
     if (i + 1) % 100 == 0 or i == 0 or i == N - 1:
         print("N =", i + 1, "out of", N)
@@ -66,6 +70,7 @@ def save_dump(points, filename="out/patches.dump", box_len=1000):
     """
     Save coordinates to a dump file, for use with OVITO
     """
+    print("dumping...")
     num = sum(pt.shape[0] for pt in points)
     Path(filename).parent.mkdir(parents=True, exist_ok=True)
     with open(filename, "w") as f:
