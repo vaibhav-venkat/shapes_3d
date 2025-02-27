@@ -1,6 +1,6 @@
 import numpy as np
-from onion import Onion
-from patch_shell import PatchShell
+from .onion import Onion
+from .patch_shell import PatchShell
 
 
 class PatchOnion:

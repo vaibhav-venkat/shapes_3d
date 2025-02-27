@@ -1,17 +1,31 @@
-from patch_shell import PatchShell
-from onion import Onion
 from pathlib import Path
 import numpy as np
 
-sphere = Onion(np.array([50, 20]), np.array([[0, 0, 0]]), np.array([1])).pts
-patches = PatchShell(50, np.array([300.0, 200.0, 900.0, 1500.0, 200.0, 3000.0]), 6, 1.6)
-pts = patches.make_patches()
+
+def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarray:
+    pts: np.ndarray = np.zeros((N, 3))
+    num_pts: int = 0
+    while num_pts < N:
+        # random point
+        R: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
+        good = True
+        for p in pts:
+            if np.linalg.norm(R - p) <= min_L:
+                good = False
+                break
+        if good:
+            pts[num_pts] = R
+            num_pts += 1
+            if num_pts == 0 or (num_pts + 1) % 50 == 0 or num_pts == N - 1:
+                print("Made center n =", num_pts + 1, "out of", N)
+    return pts
 
 
-def save_dump(points, filename="out/patches.dump", box_len=1000):
+def save_dump(points, filename: str, box_len: float):
     """
     Save coordinates to a dump file, for use with OVITO
     """
+    print("dumping...")
     num = sum(pt.shape[0] for pt in points)
     Path(filename).parent.mkdir(parents=True, exist_ok=True)
     with open(filename, "w") as f:
@@ -21,16 +35,15 @@ def save_dump(points, filename="out/patches.dump", box_len=1000):
             f"ITEM: BOX BOUNDS pp pp pp\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n{-box_len//2} {box_len//2}\n"
         )
         f.write("ITEM: ATOMS id type x y z\n")
+        max_type = 0
         for i in range(0, len(points)):
             if points[i].shape[1] == 4:
                 for j in range(points[i].shape[0]):
                     f.write(
                         f"{j + 1} {int(points[i][j][3] + i)} {points[i][j][0]:.6f} {points[i][j][1]:.6f} {points[i][j][2]:.6f}\n"
                     )
+                    max_type = max(max_type, int(points[i][j][3]))
             else:
                 for j, (x, y, z) in enumerate(points[i], start=1):
-                    f.write(f"{j} {i + 1} {x:.6f} {y:.6f} {z:.6f}\n")
+                    f.write(f"{j} {i + 1 + max_type} {x:.6f} {y:.6f} {z:.6f}\n")
         print("dumped to", filename)
-
-
-save_dump([sphere, pts], box_len=2 * 50)
