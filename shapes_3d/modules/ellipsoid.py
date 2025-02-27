@@ -3,7 +3,7 @@ import numpy as np
 
 class Ellipsoid:
     """
-    An class representing a uniform ellipsoid
+    A class representing a uniform ellipsoid
 
     Attributes
     ----------

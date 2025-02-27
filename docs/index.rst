@@ -6,14 +6,24 @@
 crease-shapes documentation
 ===========================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
 
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Shapes and Objects
 
-   modules
+   sphere
+   ellipsoid
+   cube_with_spheres
+   onion 
+   box_onions
+   patchy_sphere
+   patchy_onion
+   patchy_box
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Classes and Modules
+
+   shapes_3d.modules
 
