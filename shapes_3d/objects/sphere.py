@@ -3,6 +3,6 @@ from ..modules.utils import save_dump
 
 R = 50
 d = 0.5
-sphere = Ellipsoid(d, R)
+sphere = Ellipsoid(d, R).make_obj()
 
-save_dump([sphere], "sphere.dump", R)
+save_dump([sphere], "out/sphere.dump", R)
