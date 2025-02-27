@@ -3,6 +3,25 @@ import numpy as np
 
 
 def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarray:
+    """
+    Generate N random points in 3D space such that no two points are closer than min_L.
+
+    Parameters
+    ----------
+    N : int
+        The number of points to generate.
+    min_pt : float
+        The minimum coordinate value for each point.
+    max_pt : float
+        The maximum coordinate value for each point.
+    min_L : float
+        The minimum distance between any two points.
+
+    Returns
+    -------
+    np.ndarray
+        A array of shape (N, 3), each representing an (x, y, z) center
+    """
     pts: np.ndarray = np.zeros((N, 3))
     num_pts: int = 0
     while num_pts < N:
@@ -23,7 +42,22 @@ def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarr
 
 def save_dump(points, filename: str, box_len: float):
     """
-    Save coordinates to a dump file, for use with OVITO
+    Save coordinates to a dump file, for use with OVITO.
+
+    Parameters
+    ----------
+    points : list of np.ndarray
+        A list of 2D arrays, where each array contains points with their coordinates
+        (x, y, z), or (x, y, z, t)
+    filename : str
+        The name of the file to save the coordinates.
+    box_len : float
+        The length of the simulation box for the points.
+
+    Returns
+    -------
+    None
+        The function just writes to a file
     """
     print("dumping...")
     num = sum(pt.shape[0] for pt in points)

@@ -1,9 +1,24 @@
 import numpy as np
 
+
 class Ellipsoid:
     """
-    Use for generating a uniform distribution of points on an ellipsoid
+    An class representing a uniform ellipsoid
+
+    Attributes
+    ----------
+    density : float
+        The uniform density of the ellipsoid
+    a_o : float
+        The outer length of the semiminor axis
+    a_i : float
+        The inner length of the semiminor axis (if applicable)
+    c_o : float
+        The semimajor axis outer length (if applicable)
+    c_i : float
+        The semimajor axis inner length (if applicable)
     """
+
     def __init__(
         self,
         density: float,
@@ -13,12 +28,20 @@ class Ellipsoid:
         c_i: float = -1.0,
     ):
         """
-        Properties:
-        Density -- The density of points per unit volume
-        a_o -- the outer length of the semiminor axis
-        a_i -- the inner length of the semiminor axis
-        c_o -- the outer length of the semimajor axis
-        c_i -- the inner length of the semimajor axis
+        Initalizes an ellipsoid
+
+        Parameters
+        ----------
+        density : float
+            The uniform density of the ellipsoid
+        a_o : float
+            The outer length of the semiminor axis
+        a_i : float
+            The inner length of the semiminor axis (if applicable)
+        c_o : float
+            The semimajor axis outer length (if applicable)
+        c_i : float
+            The semimajor axis inner length (if applicable)
         """
         self.density = density
         self.a_o = a_o
@@ -35,7 +58,12 @@ class Ellipsoid:
 
     def make_obj(self) -> np.ndarray:
         """
-        Make the points with the given self properties (uniformly)
+        Makes the ellipsoid object
+
+        Returns
+        -------
+        np.ndarray
+            The points of the ellipse in the 3d plane
         """
         R_outer = max(self.a_o, self.c_o)
         N = int(self.density * (2 * R_outer) ** 3)

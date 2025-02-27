@@ -3,7 +3,34 @@ from .ellipsoid import Ellipsoid
 
 
 class Onion:
+    """
+    A representation of an "onion", with multiple shells
+
+    Attributes
+    ----------
+    radii : np.ndarray
+        The thickness of each shell, consecutively
+    center : np.ndarray
+        The center of the entire onion, with [x, y, z] coordinates
+    density : np.ndarray
+        The uniform density to use for each shell. Corresponds with the radii
+    pts : np.ndarray
+        The points of the onion
+    """
+
     def __init__(self, radii: np.ndarray, center: np.ndarray, density: np.ndarray):
+        """
+        Initializes an onion
+
+        Parameters
+        ----------
+        radii : np.ndarray
+            The thickness of each shell, consecutively
+        center : np.ndarray
+            The center of the entire onion, with [x, y, z] coordinates
+        density : np.ndarray
+            The uniform density to use for each shell. Corresponds with the radii
+        """
         self.radii: np.ndarray = radii
         self.center: np.ndarray = center
         self.density: np.ndarray = density
@@ -11,7 +38,12 @@ class Onion:
 
     def construct_pts(self) -> np.ndarray:
         """
-        Construct points of an "onion" with multiple shells and a core sphere, with the center provided
+        Generate the onion in terms of points
+
+        Returns
+        -------
+        np.ndarray
+            An array which contains the points
         """
         pts = []
         curr_radius: float = 0
