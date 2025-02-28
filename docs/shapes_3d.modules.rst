@@ -4,6 +4,7 @@ shapes\_3d.modules package
 Submodules
 ----------
 
+.. _ellipsoid-class:
 shapes\_3d.modules.ellipsoid module
 -----------------------------------
 
