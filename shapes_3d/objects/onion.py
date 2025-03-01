@@ -7,4 +7,4 @@ d: np.ndarray = np.array([0.5, 1, 0.2, 0.4])
 
 onion = Onion(R, np.array([0, 0, 0]), d).construct_pts()
 
-save_dump([onion], "out/onion.dump", np.sum(R))
+save_dump([onion], "out/onion.dump", 2 * np.sum(R))

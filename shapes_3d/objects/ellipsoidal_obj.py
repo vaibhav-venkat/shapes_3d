@@ -6,4 +6,4 @@ c = 40
 d = 0.5
 ell = Ellipsoid(d, a, 0, c).make_obj()
 
-save_dump([ell], "out/sphere.dump", max(a, c))
+save_dump([ell], "out/sphere.dump", 2 * max(a, c))
