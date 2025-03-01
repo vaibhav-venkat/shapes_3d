@@ -1,13 +1,16 @@
+.. _uni-sphere:
+
 ===============
 Uniform sphere
 ===============
 
 This structure is generated using :ref:`the Ellipsoid class <ellipsoid-class>`
 
-Box rejection sampling
--------------------------
 1. :math:`R` represents the radius of the sphere
 2. :math:`\rho` represents the density in points per unit volume
+
+Box rejection sampling
+-------------------------
 
 We can generate a uniform sphere by sampling a uniform distribution in the box around it.
 
