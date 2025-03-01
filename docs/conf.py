@@ -31,4 +31,5 @@ autodoc_default_options = {
     "exclude-members": "shapes_3d.objects",  # Exclude unwanted submodules or members
 }
 html_theme = "sphinx_rtd_theme"
+html_css_files = ["css/main.css"]
 html_static_path = ["_static"]
