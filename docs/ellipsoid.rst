@@ -1,14 +1,14 @@
-Uniform Ellipsoid
+Uniform ellipsoid
 ===================
 
 This structure is generated using :ref:`the Ellipsoid class <ellipsoid-class>`
 
 We use a similar method as defined in :ref:`the uniform sphere <uni-sphere>`
 
-1. :math:`a` represents the radius of the ellipsoid on the :math:`x` axis
-2. :math:`b` represents the radius of the ellipsoid on the :math:`y` axis
-3. :math:`c` represents the ellipsoid radius on the :math:`z` axis
-4. :math:`\rho` represents the density in points per unit volume
+Constants
+-----------
+1. :math:`a`, :math:`b`, :math:`c` each represent the radius of the ellipsoid on the :math:`x`, :math:`y`, and :math:`z` axis respectively
+2. :math:`\rho` represents the density in points per unit volume
 
 Rejection sampling with a cuboid
 ------------------------------------

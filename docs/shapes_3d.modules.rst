@@ -5,6 +5,7 @@ Submodules
 ----------
 
 .. _ellipsoid-class:
+
 shapes\_3d.modules.ellipsoid module
 -----------------------------------
 
@@ -12,6 +13,8 @@ shapes\_3d.modules.ellipsoid module
    :members:
    :show-inheritance:
    :undoc-members:
+
+.. _onion-class:
 
 shapes\_3d.modules.onion module
 -------------------------------
