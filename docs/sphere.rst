@@ -21,8 +21,8 @@ We can generate a uniform sphere by sampling a uniform distribution in the box a
 First, we generate a uniform distribution :math:`U_{box}` of points within the box 
 :math:`[-R, R]^3` with :math:`N = \lfloor (2R)^3\rho \rfloor = \lfloor 8R^3\rho \rfloor` points. 
 
-Then we systematically reject points that are outside the cube, such that each point :math:`\vec{v} = (x, y, z)` in the distribution must satisfy 
-:math:`\Vert \vec{v} \Vert \le R`. The resulting collection :math:`U_{sphere}` is a uniform sphere in :math:`\mathbf{R}^3`.
+Then we systematically reject points that are outside the cube, such that each point :math:`\mathbf{v} = (x, y, z)` in the distribution must satisfy 
+:math:`\Vert \mathbf{v} \Vert \le R`. The resulting collection :math:`U_{sphere}` is a uniform sphere in :math:`\mathbb{R}^3`.
 
 Example
 ----------

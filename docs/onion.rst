@@ -20,8 +20,8 @@ while the outer radius is :math:`r_{outer, i} = r_{inner, i} + t_i`.
 
 Now, generate a uniform box :math:`U_{box, i}` inside the bound :math:`[-r_{outer, i}, r_{outer, i}]^3`, with density :math:`d_i \in \mathbf{d}`
 
-Instead of rejecting each point :math:`\vec{v} \in \mathbb{R}^3` inside :math:`U_{box, i}` with the previous method, 
-reject the points such that we only keep :math:`\vec{v}` if :math:`r_{inner, i} \le \Vert \vec{v} \Vert \le r_{outer, i}`. 
+Instead of rejecting each point :math:`\mathbf{v} \in \mathbb{R}^3` inside :math:`U_{box, i}` with the previous method, 
+reject the points such that we only keep :math:`\mathbf{v}` if :math:`r_{inner, i} \le \Vert \mathbf{v} \Vert \le r_{outer, i}`. 
 
 Essentially, we are only keeping points within the given shell. This allows for multiple thicknesses and densities
 

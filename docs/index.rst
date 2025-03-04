@@ -14,8 +14,8 @@ crease-shapes documentation
 
    sphere
    ellipsoid
-   cube_with_spheres
    onion 
+   cube_with_spheres
    box_onions
    patchy_sphere
    patchy_onion
