@@ -1,3 +1,5 @@
+.. _uni-onion:
+
 Uniform onion
 ===============
 
