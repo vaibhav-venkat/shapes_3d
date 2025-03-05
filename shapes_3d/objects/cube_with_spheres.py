@@ -7,7 +7,7 @@ R_OM = 30.0  # Outer radius mean
 R_OS = 5.0  # Outer radius standard deviation
 R_IM = 20.0  # Inner radius mean
 R_IS = 3.0  # Inner radius standard deviatoin
-VOL_FR = 0.1  # Volume Fraction, dimensions L^(-3)
+VOL_FR = 0.05  # Volume Fraction, dimensions L^(-3)
 D1 = 0.1  # Density of core, in points per unit volume
 D2 = 0.05  # Density of shell, in points per unit volume.
 

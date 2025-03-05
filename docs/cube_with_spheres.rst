@@ -1,14 +1,14 @@
 .. _box-spheres:
 
-A Box with uniform spheres
-===========================
+A Box with uniform two-shell spheres
+===============================================
 
 Note that we generate each outer and inner radius on a log-normal distribution
 
 Constants
 ------------
 1. :math:`L` represents the length of the box
-2. :math:`R_{\mu}` represents the mean outer radius
+2. :math:`R_{\mu}` represents the mean outer radius (mantle)
 3. :math:`R_{\sigma}` represents the outer radius standard deviation
 4. :math:`r_{\mu}` represents the mean inner radius
 5. :math:`r_{\sigma}` represents the inner radius standard deviation
@@ -53,7 +53,8 @@ For more information, see the sidebar on `Wikipedia <https://en.wikipedia.org/wi
 
 Next, we will create the outer radii array :math:`\mathbf{R}` and the inner radii :math:`\mathbf{r}`.
 
-We systematically choose each outer and inner radii such that the total volume of the spheres doesn't exceed :math:`\phi L^3`.
+We systematically choose each outer and inner radii such that the total volume of the sphere (with radius being the outer shell)
+doesn't exceed :math:`\phi L^3`.
 
 **Step 1: Sampling the thickness and radii**
 
@@ -91,7 +92,7 @@ Generating the centers
 
 In order to avoid errors in scattering, we use a brute force method to generate the centers.
 Let the centers be :math:`\mathbf{C}`, a matrix of shape :math:`(N, 3)` representing each point in :math:`\mathbb{R}^3`.
-Let the maximum outer radius of all the spheres by :math:`R_{max} = \max(\mathbf{R})`
+Let the maximum outer radius of all the two-shell spheres be :math:`R_{max} = \max(\mathbf{R})`
 
 Generate any point :math:`\mathbf{v} = (x, y, z)` by generating it uniformly over :math:`[-\frac{L}{2} + R_{max}, \frac{L}{2} - R_{max}]`.
 :math:`\mathbf{v}` must have the property that it is at least a distance :math:`2 R_{max}` from other points. That is, for every 
@@ -99,7 +100,31 @@ Generate any point :math:`\mathbf{v} = (x, y, z)` by generating it uniformly ove
 
 Generating each onion
 -----------------------
-For every center :math:`\mathbf{c} \in C` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
+For every center :math:`\mathbf{c} \in \mathbf{C}` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
 with thicknesses :math:`[\mathbf{r}, \mathbf{R} - \mathbf{r}]` and densities :math:`[\rho_i, \rho_o]`. Then, add each point :math:`\mathbf{O} + \mathbf{c}` 
 (essentially displacing the points from the center)
 to the final structure :math:`\mathbf{S}`.
+
+Examples
+----------
+**The volume fraction:** :math:`\phi`
+
+.. figure:: images/box_with_spheres_volfr.png
+  :class: with-border
+  
+  A box with spheres with varying volume fractions
+
+The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
+We take constants 
+
+.. math::
+  L = 1000\\
+  R_\mu = 30\\
+  R_\sigma = 5
+  r_\mu = 20
+  r_\sigma = 3
+  \rho_o  = 0.1
+  \rho_i = 0.05
+
+These images demonstrate how certain onions will look like based on their shell count. 
+The cross section showcases their densities, which is similar to that of the :ref:`sphere <uni-sphere>`

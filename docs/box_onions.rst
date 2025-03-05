@@ -78,7 +78,7 @@ Generate any point :math:`\mathbf{v} = (x, y, z)` by generating it uniformly ove
 
 Generating each sphere
 -----------------------
-For every center :math:`\mathbf{c_i} \in C` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
+For every center :math:`\mathbf{c_i} \in \mathbf{C}` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
 with thicknesses :math:`\mathbf{T_i}` and densities :math:`\mathbf{d}`. Then, add each point :math:`\mathbf{O} + \mathbf{c_i}` 
 (essentially displacing the points from the center)
 to the final structure :math:`\mathbf{S}`.
