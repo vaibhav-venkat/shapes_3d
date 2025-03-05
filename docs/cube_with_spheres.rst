@@ -120,10 +120,10 @@ We take constants
 .. math::
   L = 1000\\
   R_\mu = 30\\
-  R_\sigma = 5
-  r_\mu = 20
-  r_\sigma = 3
-  \rho_o  = 0.1
+  R_\sigma = 5\\
+  r_\mu = 20\\
+  r_\sigma = 3\\
+  \rho_o  = 0.1\\
   \rho_i = 0.05
 
 These images demonstrate how certain onions will look like based on their shell count. 
