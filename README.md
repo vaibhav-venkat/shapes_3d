@@ -1,3 +1,7 @@
+# Offical documentation
+
+The official shapes documentation is at the [Crease Shapes ReadTheDocs](https://crease-shapes.readthedocs.io)
+
 # Objects
 
 ## Setting Up the Project Environment
