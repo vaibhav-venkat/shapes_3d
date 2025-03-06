@@ -83,3 +83,20 @@ with thicknesses :math:`\mathbf{T_i}` and densities :math:`\mathbf{d}`. Then, ad
 (essentially displacing the points from the center)
 to the final structure :math:`\mathbf{S}`.
 
+Example
+-----------
+**The volume fraction:** :math:`\phi`
+
+.. figure:: images/box_with_onions_volfr.png
+  :class: with-border
+  
+  A box of onions with varying volume fractions
+
+The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
+We take constants 
+
+.. math::
+  L = 800\\
+  \mathbf{T}_\mu = [10.0, 7.0, 6.0, 5.0, 4.0]\\
+  \mathbf{T}_\sigma = [1.5, 1.2, 0.5, 0.8, 1.0]\\
+  \mathbf{d} = [0.0, 0.05, 0.01, 0.03, 0.2]

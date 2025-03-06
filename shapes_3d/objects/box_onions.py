@@ -51,5 +51,5 @@ def save_coords(points: np.ndarray, filename: str = "out.txt") -> None:
     print("saved to", filename)
 
 
-save_coords(pts, "out/onion.txt")
-save_dump([pts], "out/onion.dump", L)
+save_coords(pts, "out/box_onion.txt")
+save_dump([pts], "out/box_onion.dump", L)
