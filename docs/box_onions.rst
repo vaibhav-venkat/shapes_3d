@@ -4,17 +4,16 @@ Box with uniform onions
 
 
 
-**Note**: This is very similar to the :ref:`box with spheres <box-spheres>`
-
 Read about :ref:`onions <uni-onion>` before this
 
-Constants
-------------
+Structural features
+----------------------
 1. :math:`L` represents the length of the box
-2. :math:`\phi` represents the volume fraction. :math:`\phi = \frac{\sum V_{i}}{L^3}`, :math:`V_i` is the volume of sphere :math:`i`
-3. :math:`\mathbf{T_\mu}` is a 1d array (vector) that represents the mean thicknesses of each shell
-4. :math:`\mathbf{T_\sigma}` is an array that represents the standard deviation of the thicknesses 
-5. :math:`\mathbf{d}` is an array that represents the densities of each shell
+2. :math:`\phi` represents the volume fraction. It is dimensionless. :math:`\phi = \frac{\sum V_{i}}{L^3}`, :math:`V_i` is the volume of sphere :math:`i`
+3. :math:`\mathbf{T_\mu}` is a 1d array (vector) that represents the mean thicknesses of each shell.
+4. :math:`\mathbf{T_\sigma}` is an array that represents the standard deviation of the thicknesses .
+5. :math:`\mathbf{d}` is an array that represents each shell's density of scatters. 
+   Each density is represented in scatters (points) per unit volume.
 
 The distribution of radii
 --------------------------
@@ -80,7 +79,7 @@ Generating each sphere
 -----------------------
 For every center :math:`\mathbf{c_i} \in \mathbf{C}` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
 with thicknesses :math:`\mathbf{T_i}` and densities :math:`\mathbf{d}`. Then, add each point :math:`\mathbf{O} + \mathbf{c_i}` 
-(essentially displacing the points from the center)
+(essentially displacing the points from the origin to the center)
 to the final structure :math:`\mathbf{S}`.
 
 Example
@@ -93,7 +92,7 @@ Example
   A box of onions with varying volume fractions
 
 The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
-We take constants 
+We take some features as constants:
 
 .. math::
   L = 800\\

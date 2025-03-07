@@ -4,25 +4,30 @@
 Uniform sphere
 ===============
 
-This structure is generated using :ref:`the Ellipsoid class <ellipsoid-class>`
 
-Constants
-------------
-1. :math:`R` represents the radius of the sphere
-2. :math:`\rho` represents the density in points per unit volume
+Structural features
+----------------------
+1. :math:`R` represents the radius of the sphere in unit length.
+2. :math:`\rho` represents the density of scatters in scatters (points) per unit volume.
 
-.. _box-rejection:
+Schematic
+-------------------
+.. figure:: images/Spheroid.png
+   
+   The official design of the uniform sphere
 
-Box rejection sampling
------------------------
+Structure Generation
+----------------------
 
-We can generate a uniform sphere by sampling a uniform distribution in the box around it.
+We can generate a uniform sphere by sampling a uniform distribution in the box around it, then rejecting certain scatters.
 
-First, we generate a uniform distribution :math:`U_{box}` of points within the box 
-:math:`[-R, R]^3` with :math:`N = \lfloor (2R)^3\rho \rfloor = \lfloor 8R^3\rho \rfloor` points. 
+First, we generate a uniform distribution :math:`U_{box}` of scatters within the box containing the sphere,
+:math:`[-R, R]^3`, with :math:`N = \lfloor (2R)^3\rho \rfloor = \lfloor 8R^3\rho \rfloor` points. 
 
-Then we systematically reject points that are outside the cube, such that each point :math:`\mathbf{v} = (x, y, z)` in the distribution must satisfy 
-:math:`\Vert \mathbf{v} \Vert \le R`. The resulting collection :math:`U_{sphere}` is a uniform sphere in :math:`\mathbb{R}^3`.
+Then we systematically reject scatters that are outside the cube, such that each vector (point) :math:`\mathbf{v} = (x, y, z)` 
+in the distribution must satisfy :math:`\Vert \mathbf{v} \Vert \le R`. 
+That is, if the condition is met, the vector will be added to a new collection :math:`U_{sphere}`.
+The resulting collection, :math:`U_{sphere}`, is a uniform sphere in :math:`\mathbb{R}^3`.
 
 Example
 ----------
@@ -32,11 +37,6 @@ Example
    Three examples of uniform spheres, with different densities and radii.
 
 The example above showcases different parameters used to generate these spheres.
-The left image contains densely clustered points, while the right image contains scattered points.
+The left image contains densely clustered scatters, while the right image contains spread out scatters.
 
-Official Schematic
--------------------
-.. figure:: images/Spheroid.png
-   
-   The official design of the uniform sphere
-
+This structure is generated using :ref:`the Ellipsoid class <ellipsoid-class>`
