@@ -35,14 +35,14 @@ We systematically choose each outer and inner radii such that the total volume o
 
 **Step 1: Sampling the thickness and radii**
 
-For each iteration :math:`i`, choose the thickness :math:`\mathbf{t}` such that
+For each iteration :math:`i`, choose the thickness :math:`\mathbf{t}_i` such that
 
 .. math::
-  \mathbf{T_s} \sim \text{Lognormal}(\mathbf{m_T}, \mathbf{s_T})
+  \mathbf{t}_i \sim \text{Lognormal}(\mathbf{m_T}, \mathbf{s_T})
 
 **Step 2: Termination with volume fraction**
 
-After each iteration, calculate the current volume :math:`V = \frac{4}{3} \pi \sum_{k=0}^i t_{ij}`
+After each iteration, calculate the current volume :math:`V = \frac{4}{3} \pi \sum_{j=0}^i t_{ij}`
 The total volume :math:`V_{tot}` is updated as well:
 
 .. math::

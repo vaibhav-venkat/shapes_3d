@@ -7,7 +7,7 @@ Uniform sphere
 
 Structural features
 ----------------------
-1. :math:`R` represents the radius of the sphere in unit length.
+1. :math:`R` represents the radius of the sphere
 2. :math:`\rho` represents the density of scatters in scatters (points) per unit volume.
 
 Schematic

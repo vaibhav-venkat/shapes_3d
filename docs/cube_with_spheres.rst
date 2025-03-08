@@ -17,24 +17,28 @@ Structural features
 7. :math:`\rho_{o}` represents the outer shell's density of scatters in scatters (points) per unit volume.
 8. :math:`\rho_i` represents the inner shell's density of scatters in scatters (point) per unit volume.
 
+Schematic
+------------
+
+.. figure:: images/Core-Corona-Spheroid.png
+
+   The design of a two-shell sphere
+
 
 Converting the shell to thickness
 ----------------------------------
 
 
 When generating the log-normal distribution, there are cases where the outer radius :math:`R` is less than the inner radius :math:`r`.
-This is simply due to the nature of the standard deviations
 
 One fix is to change the :math:`R_{\mu}` and :math:`R_{\sigma}` to a corresponding thickeness mean and standard deviation 
-:math:`T_\mu` and :math:`T_\sigma`. To accurately represent the thickness, 
+:math:`T_\mu` and :math:`T_\sigma`, respectively. To accurately represent the thickness, 
 let
 
 .. math::
   T_\mu = R_\mu - r_\mu 
 
   T_\sigma = \sqrt{R_\sigma ^ 2 - r_\sigma ^ 2}
-
-The second line is due to uncertainty and propagation (quadrature)
 
 The distribution of radii
 --------------------------
@@ -105,10 +109,10 @@ The left and right bounds are adjusted so that the two-shell sphere doesn't gene
 :math:`\mathbf{v}` must have the property that it is at least a distance :math:`2 R_{max}` from other points. That is, for every 
 :math:`\mathbf{p} \in \mathbf{C}`, :math:`\Vert \mathbf{v} - \mathbf{p} \Vert > 2 R_{max}`
 
-Generating each onion
+Generating each sphere
 -----------------------
-For every center :math:`\mathbf{c} \in \mathbf{C}` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
-with thicknesses :math:`\mathbf{T} = [\mathbf{r}, \mathbf{R} - \mathbf{r}]` and densities 
+For every center :math:`\mathbf{c}_j \in \mathbf{C}` generate a :ref:`uniform onion <uni-onion>` :math:`\mathbf{O}`
+with thicknesses :math:`\mathbf{T} = [r_j, R_j - r_j]` and densities 
 :math:`\mathbf{d} = [\rho_i, \rho_o]`. Then, add each point :math:`\mathbf{O} + \mathbf{c}` 
 (essentially displacing the points from the origin to the center)
 to the final structure :math:`\mathbf{S}`.
@@ -133,6 +137,3 @@ We take some features as constants:
   r_\sigma = 3\\
   \rho_o  = 0.1\\
   \rho_i = 0.05
-
-These images demonstrate how certain onions will look like based on their shell count. 
-The cross section showcases their densities, which is similar to that of the :ref:`sphere <uni-sphere>`
