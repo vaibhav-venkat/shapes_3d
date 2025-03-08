@@ -8,11 +8,11 @@ Read about :ref:`onions <uni-onion>` before this
 
 Structural features
 ----------------------
-1. :math:`L` represents the length of the box
-2. :math:`\phi` represents the volume fraction. It is dimensionless. :math:`\phi = \frac{\sum V_{i}}{L^3}`, :math:`V_i` is the volume of sphere :math:`i`
-3. :math:`\mathbf{T_\mu}` is a 1d array (vector) that represents the mean thicknesses of each shell.
-4. :math:`\mathbf{T_\sigma}` is an array that represents the standard deviation of the thicknesses .
-5. :math:`\mathbf{d}` is an array that represents each shell's density of scatters. 
+1. :math:`L` is the length of the box
+2. :math:`\phi` is the volume fraction. It is dimensionless. :math:`\phi = \frac{\sum V_{i}}{L^3}`, :math:`V_i` is the volume of sphere :math:`i`
+3. :math:`\mathbf{T_\mu}` is a vector that represents the mean thicknesses of each shell.
+4. :math:`\mathbf{T_\sigma}` is an vectorthat represents the standard deviation of the thicknesses .
+5. :math:`\mathbf{d}` is an vector that represents each shell's density of scatters. 
    Each density is represented in scatters (points) per unit volume.
 
 The distribution of radii

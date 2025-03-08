@@ -8,14 +8,14 @@ Note that we generate each outer and inner radius on a log-normal distribution.
 
 Structural features
 ---------------------
-1. :math:`L` represents the length of the box.
-2. :math:`R_{\mu}` represents the mean outer radius.
-3. :math:`R_{\sigma}` represents the outer radius standard deviation.
-4. :math:`r_{\mu}` represents the mean inner radius.
-5. :math:`r_{\sigma}` represents the inner radius standard deviation.
-6. :math:`\phi` represents the volume fraction. It is dimensionless. :math:`\phi = \frac{\sum V_{i}}{L^3}`, :math:`V_i` is the volume of sphere :math:`i`.
-7. :math:`\rho_{o}` represents the outer shell's density of scatters in scatters (points) per unit volume.
-8. :math:`\rho_i` represents the inner shell's density of scatters in scatters (point) per unit volume.
+1. :math:`L` is the length of the box.
+2. :math:`R_{\mu}` is the mean outer radius.
+3. :math:`R_{\sigma}` is the outer radius standard deviation.
+4. :math:`r_{\mu}` is the mean inner radius.
+5. :math:`r_{\sigma}` is the inner radius standard deviation.
+6. :math:`\phi` is the volume fraction. It is dimensionless. :math:`\phi = \frac{\sum V_{i}}{L^3}`, :math:`V_i` is the volume of sphere :math:`i`.
+7. :math:`\rho_{o}` is the outer shell's density of scatters in scatters (points) per unit volume.
+8. :math:`\rho_i` is the inner shell's density of scatters in scatters (point) per unit volume.
 
 Schematic
 ------------
@@ -60,7 +60,7 @@ Then, create the new mean,
 
 For more information, see the sidebar on `Wikipedia <https://en.wikipedia.org/wiki/Log-normal_distribution>`_
 
-Next, we will create the outer radii array :math:`\mathbf{R}` and the inner radii :math:`\mathbf{r}`.
+Next, we will create the outer radii vector :math:`\mathbf{R}` and the inner radii :math:`\mathbf{r}`.
 
 We systematically choose each outer and inner radii such that the total volume of the sphere (with radius being the outer shell)
 doesn't exceed :math:`\phi L^3`.
@@ -89,7 +89,7 @@ This process continues until :math:`V_{tot} > \phi L^3`.
 
 **Step 3: Storing the radii**
 
-The sequences of the outer and inner radii are stored as vectors (represented as 1D arrays in code):
+The sequences of the outer and inner radii are stored as vectors:
 
 .. math::
    \mathbf{r} = [r_0, r_1, \dots, r_N]

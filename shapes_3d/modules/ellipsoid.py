@@ -9,23 +9,23 @@ class Ellipsoid:
     ----------
     density : float
         The uniform density of the ellipsoid
-    a_o : float
-        The outer length of the semiminor axis
-    a_i : float
-        The inner length of the semiminor axis (if applicable)
-    c_o : float
-        The semimajor axis outer length (if applicable)
-    c_i : float
-        The semimajor axis inner length (if applicable)
+    x_outer_radius : float
+        The outer radius of the x axis
+    x_inner_radius : float | None
+        The inner radius of the x axis
+    z_outer_radius : float | None
+        The z axis outer radius
+    z_inner_radius : float | None
+        The z axis inner radius
     """
 
     def __init__(
         self,
         density: float,
-        a_o: float,
-        a_i: float = 0,
-        c_o: float = -1.0,
-        c_i: float = -1.0,
+        x_outer_radius: float,
+        x_inner_radius: float | None = None,
+        z_outer_radius: float | None = None,
+        z_inner_radius: float | None = None,
     ):
         """
         Initalizes an ellipsoid
@@ -34,27 +34,34 @@ class Ellipsoid:
         ----------
         density : float
             The uniform density of the ellipsoid
-        a_o : float
-            The outer length of the semiminor axis
-        a_i : float
-            The inner length of the semiminor axis (if applicable)
-        c_o : float
-            The semimajor axis outer length (if applicable)
-        c_i : float
-            The semimajor axis inner length (if applicable)
+        x_outer_radius : float | None
+            The outer radius of the x axis
+        x_inner_radius : float | None
+            The inner radius of the x axis
+        z_outer_radius : float | None
+            The z axis outer radius
+        z_inner_radius : float | None
+            The z axis inner radius
         """
         self.density = density
-        self.a_o = a_o
-        self.a_i = a_i
-        # Special cases for spheres
-        if c_o == -1.0:
-            self.c_o = a_o
+        if x_inner_radius is None:
+            self.x_inner_radius: float = 0
         else:
-            self.c_o = c_o
-        if c_i == -1.0:
-            self.c_i = a_i
-        else:
-            self.c_i = c_i
+            self.x_inner_radius: float = x_inner_radius
+
+        self.x_outer_radius: float = x_outer_radius
+
+        if (
+            z_outer_radius == x_outer_radius
+            or z_outer_radius is None
+            or z_inner_radius is None
+        ):
+            self.z_outer_radius: float = x_outer_radius
+            self.z_inner_radius: float = self.x_inner_radius
+            return
+
+        self.z_outer_radius: float = z_outer_radius
+        self.z_inner_radius: float = z_inner_radius
 
     def make_obj(self) -> np.ndarray:
         """
@@ -63,16 +70,21 @@ class Ellipsoid:
         Returns
         -------
         np.ndarray
-            The points of the ellipse in the 3d plane
+            The points of the ellispoid in the 3d plane
         """
-        R_outer = max(self.a_o, self.c_o)
-        N = int(self.density * (2 * R_outer) ** 3)
-        pts = np.random.uniform(low=-R_outer, high=R_outer, size=(N, 3))
-        norm_pts = pts / np.array([self.a_o, self.a_o, self.c_o])
-        if self.a_i == 0:
+
+        r_max = max(self.x_outer_radius, self.z_outer_radius)
+        N = int(self.density * (2 * r_max) ** 3)
+        pts = np.random.uniform(low=-r_max, high=r_max, size=(N, 3))
+        norm_pts = pts / np.array(
+            [self.x_outer_radius, self.x_outer_radius, self.z_outer_radius]
+        )
+        if self.x_inner_radius == 0:
             norm_i = np.ones(shape=pts.shape)
         else:
-            norm_i = pts / np.array([self.a_i, self.a_i, self.c_i])
+            norm_i = pts / np.array(
+                [self.x_inner_radius, self.x_inner_radius, self.z_inner_radius]
+            )
         sd_o = np.sum(norm_pts**2, axis=1)
         sd_i = np.sum(norm_i**2, axis=1)
         inside = (sd_o <= 1) & (sd_i >= 1)

@@ -1,16 +1,18 @@
 Uniform ellipsoid
 ===================
 
+To avoid confusion, please read about the :ref:`uniform sphere <uni-sphere>`
+
 Structural features
 --------------------
 1. :math:`a`, :math:`b`, :math:`c` each represent the radius of the ellipsoid on the :math:`x`, :math:`y`, and :math:`z` axis respectively.
-2. :math:`\rho` represents the density of scatters in scatters (points) per unit volume.
+2. :math:`\rho` is the density of scatters in scatters (points) per unit volume.
 
 Schematic
 -------------------
 .. figure:: images/Ellipsoid.png
    
-   The official design of the uniform ellipsoid
+   The schematic representation of the uniform ellipsoid
 
 Ellipsoid Generation
 ------------------------------------
@@ -22,7 +24,7 @@ The points are created such that they are bounded by the cuboid :math:`\left[ -a
 This is the bounding box surrounding the future ellipsoid.
 
 Then, let the ellipsoid :math:`U = \left\{(x, y, z) \in U_c \mid \frac{x^2}{a^2} + \frac{y^2}{b^2} + \frac{z^2}{c^2} \le 1 \right\}`.
-Essentially, we reject any points in the box that are outside the ellipsoid region.
+Essentially, we keep all points in the box that are in the ellipsoid region.
 
 Example
 ----------

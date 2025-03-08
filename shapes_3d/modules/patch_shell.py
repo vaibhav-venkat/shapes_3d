@@ -80,10 +80,9 @@ class PatchShell:
         L: float = self.R * np.arccos(1 - P)  # Arc length (diameter equivalent)
         polar_change: float = L / self.R  # Change in polar angle
         patch = []
-        sampler = qmc.Sobol(d=2, scramble=True)
+        sampler = qmc.Sobol(d=1, scramble=True)
         sampler = sampler.random(int(2 ** (np.ceil(np.log2(n_pts)))))  # Sobol sampling
         v = sampler[:, 0]
-        u = sampler[:, 1]
         for v_0 in v:
             polar = np.arccos(
                 1 - v_0 * (1 - np.cos(polar_change / 2))
