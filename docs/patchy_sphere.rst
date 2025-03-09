@@ -7,8 +7,6 @@ Structural features
 1. :math:`R` is the radius of the sphere
 2. :math:`\rho_\text{sphere}` is the density of scatters in the sphere, in scatters per unit volume.
 3. :math:`\mathbf{Y}` is an vector representing the area of the patches. 
-   If each patch contains the same area, then :math:`\mathbf{Y}` can be treated as an integer in the code.
-   We wil assume it is a vector in the documentation
 4. :math:`X` is the number of patches on the sphere
 5. :math:`\rho_\text{patch}` is the density of scatters in the patch, in scatters per unit area.
 
@@ -23,24 +21,23 @@ Schematic
 There are two components to the structure, the sphere and the patches. The
 sphere is made by simply using the method of the :ref:`uniform sphere <uni-sphere>`.
 
-We will primarily focus on the patches
-
-In order to make a patch, we generate it with its radius, as it is more simple than its area.
-
-The radius :math:`L_i` of a patch with area :math:`Y_i` can be found as follows
 
 Step 1: Converting the area to radius
 ---------------------------------------------
 
-Lets assume we have an radius :math:`L_i`. 
+In order to make a patch, we generate it with its radius. This is because
+we need a specific arc length in order to generate the patch using code. The area on its own is
+not informative.
 
 
-First, we find the patch's radius in the plane.
+Lets assume we have an radius :math:`L_i` and an area of :math:`Y_i`. 
+
+
+First, we find the patch's position :math:`x` in the plane.
 
 Lets decompose the patch so we can represent it in the plane. 
-Because the radius is not position dependent, 
-we can select the patch to be centered (WLOG) at the polar angle 
-:math:`0` rad. 
+We can select the patch to be centered at the polar angle 
+:math:`0` rad.
 
 First, we know that :math:`x = R \sin \theta`, so lets find the polar angle :math:`\theta` of the patch's boundary (see Figure 1.). 
 At any point :math:`l` within the radius :math:`L_i`:
@@ -78,8 +75,12 @@ Step 2: Generating a patch centered at the north pole
 ------------------------------------------------------
 
 Next, in order to actually make the patches, we create a patch centered at the 
-polar angle :math:`0`, and then we rotate it. We do this process for each 
-patch, so we omit the iteration symbol :math:`i` for brevity.
+polar angle :math:`0`, and then we rotate it. We do the same process for each 
+patch, so we omit the iteration symbol :math:`i` for brevity. 
+
+We start at the North Pole because the scatters on a patch will distort if we start at the centers. 
+This is because revolving the points around the z axis creates a much larger circle the closer we are to the equator,
+and we defined our arc radius (above) with the north pole in mind.
 
 
 We generate the patch by sampling the polar and azimuthal angles.
@@ -94,8 +95,9 @@ Since :math:`N_{polar} \cdot N_{azi} \le N_{tot}` (the total scatters),
 Note that this is an estimation.
 
 Next, we generate :math:`n_{\text{samples}}` polar angles within the patch.  In order to avoid clustering and gaps within the patch, we use a 
-quasi-random `Sobol sequence <https://en.wikipedia.org/wiki/Sobol_sequence>`_, sampling over the interval :math:`[0, 1)`.
-That is, :math:`\mathbf{v} = [v_1, v_2, \dots, v_{n_{\text{samples}}}]` where :math:`v_k \sim \text{Sobol}(0,)`
+quasi-random `Sobol sequence <https://en.wikipedia.org/wiki/Sobol_sequence>`_, sampling over the interval :math:`[0, 1)`. We
+use a Sobol sequence because without it we see frequent gaps in the center of the patch, and also in the outer rings.
+We generate a sequence :math:`\mathbf{v} = [v_1, v_2, \dots, v_{n_{\text{samples}}}]` where :math:`v_k \sim \text{Sobol}(0,1)`
 for :math:`k = 1, 2, \dots, n_{\text{samples}}`
 
 We convert these values into polar angles :math:`\boldsymbol{\theta} = [\theta_1, \theta_2, \dots, \theta_{n_{\text{samples}}}]`.
@@ -125,6 +127,7 @@ a scatter :math:`\mathbf{p_kj} \in \mathbb{R}^3`:
 Essentially, for each polar angle we are generating scatters with all the azimuthal angles.
 Let the matrix :math:`\mathbf{P}` be the collection of all such scatters, having a shape of :math:`((n_{\text{samples}})^2, 3)`
 
-Step 3: Rotate the points
+Step 3: Finding the centers
 ---------------------------
+
 
