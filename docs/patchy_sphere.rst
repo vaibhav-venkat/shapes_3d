@@ -6,7 +6,7 @@ Structural features
 --------------------
 1. :math:`R` is the radius of the sphere
 2. :math:`\rho_\text{sphere}` is the density of scatters in the sphere, in scatters per unit volume.
-3. :math:`\mathbf{Y}` is an vector representing the area of the patches. 
+3. :math:`\mathbf{Y}` is a vector representing the area of the patches. 
 4. :math:`X` is the number of patches on the sphere
 5. :math:`\rho_\text{patch}` is the density of scatters in the patch, in scatters per unit area.
 
@@ -30,16 +30,16 @@ we need a specific arc length in order to generate the patch using code. The are
 not informative.
 
 
-Lets assume we have an radius :math:`L_i` and an area of :math:`Y_i`. 
+Let's assume we have a radius :math:`L_i` and an area of :math:`Y_i`. 
 
 
 First, we find the patch's position :math:`x` in the plane.
 
-Lets decompose the patch so we can represent it in the plane. 
+Let's decompose the patch so we can represent it in the plane. 
 We can select the patch to be centered at the polar angle 
 :math:`0` rad.
 
-First, we know that :math:`x = R \sin \theta`, so lets find the polar angle :math:`\theta` of the patch's boundary (see Figure 1.). 
+First, we know that :math:`x = R \sin \theta`, so let's find the polar angle :math:`\theta` of the patch's boundary (see Figure 1.). 
 At any point :math:`l` within the radius :math:`L_i`:
 
 .. math::
@@ -53,7 +53,7 @@ At any point :math:`l` within the radius :math:`L_i`:
    Figure 1. The patch's radius in the plane is denoted as :math:`x`, its polar angle for its radius :math:`\theta`, and its radius :math:`l`. 
 
 Next, take a small strip of the patch with a width of :math:`dl` (See figure 2). The area of the strip is :math:`2 \pi x dl`.
-(circumfrence times width). Thus, the total area :math:`Y_i` of the patch is:
+(circumference times width). Thus, the total area :math:`Y_i` of the patch is:
 
 .. math::
    Y_i = \int_{0}^L 2 \pi R \sin \left(\frac{l}{R}\right) dl \\
@@ -69,7 +69,7 @@ Thus
 .. figure:: images/patches/area_derive.png
    :width: 60%
 
-   Figure 2. A small strip of the patch with width :math:`dl`, and circumfrence :math:`2 \pi x`
+   Figure 2. A small strip of the patch with width :math:`dl`, and circumference :math:`2 \pi x`
 
 Step 2: Generating a patch centered at the north pole
 ------------------------------------------------------
@@ -111,7 +111,7 @@ This mapping ensures that any :math:`\theta_k` is within the interval :math:`[0,
 :math:`\theta_k = 0` when :math:`v_k = 0`, 
 and :math:`\theta_k \rightarrow  \theta_{fin}` when :math:`v_k \rightarrow 1`.
 
-For the azimuthal angles, we generate a vecotr :math:`\boldsymbol{\phi} = [\phi_1, \phi_2, \dots, \phi_{n_{\text{samples}}}]` of
+For the azimuthal angles, we generate a vector :math:`\boldsymbol{\phi} = [\phi_1, \phi_2, \dots, \phi_{n_{\text{samples}}}]` of
 uniformly distributed values within the interval :math:`[0, 2 \pi)`. That is, :math:`\phi_j \sim \text{uniform}(0, 2\pi)` for
 :math:`j = 1, 2, \dots, n_{\text{samples}}`.
 
@@ -125,9 +125,28 @@ a scatter :math:`\mathbf{p_kj} \in \mathbb{R}^3`:
    R \cos (\theta_k)\right]
 
 Essentially, for each polar angle we are generating scatters with all the azimuthal angles.
-Let the matrix :math:`\mathbf{P}` be the collection of all such scatters, having a shape of :math:`((n_{\text{samples}})^2, 3)`
 
 Step 3: Finding the centers
 ---------------------------
 
+Before rotating the patches, we need a coordinate that represents each patch's center. 
+We will use spherical coordinates.
+
+We will use the Fibonacci sphere method in order to make the patches as 
+evenly spaced as we can. The Fibonacci method makes use of the golden ratio.
+
+We first generate an "index" array, of which we base our polar and azimuthal centers on. 
+It is a vector :math:`\mathbf{u}` with :math:`X` evenly spaced values, starting from :math:`0`. 
+That is, :math:`\mathbf{u} = [0, 1, 2, \dots, X - 1]`.
+
+The polar and azimuthal centers are defined by:
+
+.. math::
+   \boldsymbol{\theta} = \cos^{-1} \left(1 - \frac{2 \cdot \mathbf{u}}{X}\right) \\
+   \boldsymbol{\phi} = \frac{2 \pi \cdot u}{\varphi} \qquad (\varphi = (1 + \sqrt{5})/2)
+
+with :math:`\varphi` being the golden ratio
+
+A patch :math:`k` has a center of :math:`(R, \theta_k, \phi_k)` for 
+:math:`\theta_k \in \boldsymbol{\theta}` and :math:`\phi_k \in \boldsymbol{\phi}`
 
