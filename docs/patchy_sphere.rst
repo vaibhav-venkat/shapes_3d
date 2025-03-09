@@ -150,3 +150,5 @@ with :math:`\varphi` being the golden ratio
 A patch :math:`k` has a center of :math:`(R, \theta_k, \phi_k)` for 
 :math:`\theta_k \in \boldsymbol{\theta}` and :math:`\phi_k \in \boldsymbol{\phi}`
 
+.. TODO: add more images and diagrams.
+.. TODO: Finish the rotation part.
