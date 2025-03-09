@@ -147,8 +147,25 @@ The polar and azimuthal centers are defined by:
 
 with :math:`\varphi` being the golden ratio
 
-A patch :math:`k` has a center of :math:`(R, \theta_k, \phi_k)` for 
-:math:`\theta_k \in \boldsymbol{\theta}` and :math:`\phi_k \in \boldsymbol{\phi}`
+A patch :math:`i` has a center of :math:`(R, \theta_i, \phi_i)` for 
+:math:`\theta_i \in \boldsymbol{\theta}` and :math:`\phi_i \in \boldsymbol{\phi}`
 
-.. TODO: add more images and diagrams.
-.. TODO: Finish the rotation part.
+Step 4: Rotate the patches
+-----------------------------
+
+Finally, we rotate a patch at the north pole to the given center.
+
+For a patch :math:`i` we rotate a patch at the north pole to the center :math:`(R, \theta_i, \phi_i)`.
+
+First, we rotate the patch about the :math:`y`-axis. We use `rotational quaternions <https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation>`_.
+Quaternions are a precise way to define rotations. Our first rotational quaternion will 
+rotate all points by the polar angle :math:`\theta_i` around the :math:`y`-axis, and the 
+next quaternion will rotate the patch around the z-axis (after the first rotation) by
+:math:`\phi_i` (azimuthal angle). The quaternions are:
+
+.. math::
+  \mathbf{q}_{i,1} = \left(\cos\frac{\theta_i}{2}, 0, \sin\frac{\theta_i}{2}, 0\right)\\
+  \mathbf{q}_{i,2} = \left(\cos\frac{\phi_i}{2}, 0, 0, \sin\frac{\phi_i}{2}\right)
+
+We first apply :math:`\mathbf{q}_{i,1}`, then :math:`\mathbf{q}_{i,2}`
+
