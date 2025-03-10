@@ -1,8 +1,8 @@
+.. _box-onion:
+
 ============================
 Box with uniform onions
 ============================
-
-
 
 Read about :ref:`onions <uni-onion>` before this
 

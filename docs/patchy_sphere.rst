@@ -8,7 +8,7 @@ Structural features
 2. :math:`\rho_\text{sphere}` is the density of scatters in the sphere, in scatters per unit volume.
 3. :math:`\mathbf{Y}` is a vector representing the area of the patches. 
 4. :math:`X` is the number of patches on the sphere
-5. :math:`\rho_\text{patch}` is the density of scatters in the patch, in scatters per unit area.
+5. :math:`\rho_\text{patch}` is the density of scatters in a patch, in scatters per unit area.
 
 Schematic
 -----------
@@ -17,9 +17,18 @@ Schematic
    
    The design of a patchy sphere, with one patch labeled
 
+There are two components to the structure, the sphere and the patches. 
 
-There are two components to the structure, the sphere and the patches. The
-sphere is made by simply using the method of the :ref:`uniform sphere <uni-sphere>`.
+The sphere
+-------------
+The sphere is made by simply using the same instructions in :ref:`uniform sphere <uni-sphere>`
+with radius :math:`R` and density :math:`\rho_\text{sphere}`.
+
+.. _patch-sphere-method:
+
+Creating the patches
+----------------------
+We create the patches using the series of steps below.
 
 
 Step 1: Converting the area to radius
@@ -148,7 +157,11 @@ The polar and azimuthal centers are defined by:
 with :math:`\varphi` being the golden ratio
 
 A patch :math:`i` has a center of :math:`(R, \theta_i, \phi_i)` for 
-:math:`\theta_i \in \boldsymbol{\theta}` and :math:`\phi_i \in \boldsymbol{\phi}`
+:math:`\theta_i \in \boldsymbol{\theta}` and :math:`\phi_i \in \boldsymbol{\phi}`.
+
+We then randomly rotate each center using quaternions, as described in step 4. We
+generate a random vector :math:`\mathbf{v}` with 4 components, each component :math:`v_i \in [0, 1]`.
+We apply one rotation to all the centers, so that the patches will still be evenly spaced.
 
 Step 4: Rotate the patches
 -----------------------------
@@ -168,4 +181,11 @@ next quaternion will rotate the patch around the z-axis (after the first rotatio
   \mathbf{q}_{i,2} = \left(\cos\frac{\phi_i}{2}, 0, 0, \sin\frac{\phi_i}{2}\right)
 
 We first apply :math:`\mathbf{q}_{i,1}`, then :math:`\mathbf{q}_{i,2}`
+
+
+Examples
+----------
+
+TODO: Add examples
+
 
