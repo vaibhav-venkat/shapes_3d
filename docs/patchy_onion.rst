@@ -14,9 +14,9 @@ Structural features
 
 Schematic
 -----------
-.. .. figure:: 
-..  
-..    The design of a patchy onion, with one patch labeled
+.. figure:: images/onion_with_patch.png
+ 
+   The design of a patchy onion, with one patch labeled
 
 There are two components to the structure: the onion and the patches.
 
