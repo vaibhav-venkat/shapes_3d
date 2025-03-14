@@ -46,19 +46,20 @@ class Onion:
             An array which contains the points
         """
         pts = []
-        curr_radius: float = 0
-        i: int = 0
-        for i in range(len(self.radii)):
+        current_radius: float = 0
+        shell_id: int = 0
+        for shell_id, radius in enumerate(self.radii):
             # create a new shell with the provided thickness, centered
-            curr_shell: list = (
+            shell: list = (
                 Ellipsoid(
-                    float(self.density[i]), curr_radius + self.radii[i], curr_radius
+                    float(self.density[shell_id]),
+                    current_radius + self.radii[shell_id],
+                    current_radius,
                 ).make_obj()
                 + self.center
             ).tolist()
-            for row in curr_shell:
-                row.append(i + 1)
-            pts.extend(curr_shell)
-            curr_radius += self.radii[i]
-            i += 1
+            for row in shell:
+                row.append(shell_id + 1)
+            pts.extend(shell)
+            current_radius += radius
         return np.array(pts)

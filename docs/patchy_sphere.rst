@@ -105,7 +105,7 @@ Note that this is an estimation.
 
 Next, we generate :math:`n_{\text{samples}}` polar angles within the patch.  In order to avoid clustering and gaps within the patch, we use a 
 quasi-random `Sobol sequence <https://en.wikipedia.org/wiki/Sobol_sequence>`_, sampling over the interval :math:`[0, 1)`. We
-use a Sobol sequence because without it we see frequent gaps in the center of the patch, and also in the outer rings.
+use a Sobol sequence because without it we see frequent in the outer rings.
 We generate a sequence :math:`\mathbf{v} = [v_1, v_2, \dots, v_{n_{\text{samples}}}]` where :math:`v_k \sim \text{Sobol}(0,1)`
 for :math:`k = 1, 2, \dots, n_{\text{samples}}`
 
@@ -160,7 +160,7 @@ A patch :math:`i` has a center of :math:`(R, \theta_i, \phi_i)` for
 :math:`\theta_i \in \boldsymbol{\theta}` and :math:`\phi_i \in \boldsymbol{\phi}`.
 
 We then randomly rotate each center using quaternions, as described in step 4. We
-generate a random vector :math:`\mathbf{v}` with 4 components, each component :math:`v_i \in [0, 1]`.
+generate a random vector :math:`\mathbf{v}` with 4 components, each component :math:`v_i \in [-1, 1]`.
 We apply one rotation to all the centers, so that the patches will still be evenly spaced.
 
 Step 4: Rotate the patches
@@ -186,6 +186,20 @@ We first apply :math:`\mathbf{q}_{i,1}`, then :math:`\mathbf{q}_{i,2}`
 Examples
 ----------
 
-TODO: Add examples
+Examples
+----------
+**The volume fraction:** :math:`\phi`
 
+.. figure:: images/patch_sphere_num.png
+  :class: with-border
+  
+  A uniform sphere with patches. All of the spheres have structural features :math:`R = 50`, :math:`\rho_\text{sphere}=1`,
+  :math:`\rho_\text{patch} = 0.3`. They have a varying patch number and size, with with bigger sizes and smaller numbers towards
+  the right.
 
+.. figure:: images/patch_sphere_density.png
+  :class: with-border
+  
+  A uniform sphere with patches. All have structural features :math:`R = 50`, :math:`\rho_\text{sphere}=1`,
+  :math:`X = 8`, :math:`\mathbf{Y} = \{ 5000 \mid X \text{ times} \}`. They vary in patch density, in scatters per unit area, 
+  with with more clustered (larger densities) towards the left.

@@ -20,9 +20,9 @@ class PatchOnion:
         radii: np.ndarray,
         center: np.ndarray,
         density: np.ndarray,
-        Y: float | np.ndarray,
-        X: int,
-        patch_den: float,
+        patch_area: float | np.ndarray,
+        num_patches: int,
+        patch_density: float,
     ):
         """
         Initializes the object
@@ -35,16 +35,18 @@ class PatchOnion:
             The center of the entire onion, with [x, y, z] coordinates
         density : np.ndarray
             The uniform density to use for each shell. Corresponds with the radii
-        Y : float | np.ndarray
+        patch_area : float | np.ndarray
             The area of the patches
-        X : int
+        num_patches : int
             The number of patches
-        patch_den: float
+        patch_density: float
             The density of each patch
         """
         self.onion: Onion = Onion(radii, center, density)
-
-        self.patch_obj: PatchShell = PatchShell(np.sum(radii), Y, X, patch_den)
+        total_radius: float = np.sum(radii)
+        self.patch_obj: PatchShell = PatchShell(
+            total_radius, patch_area, num_patches, patch_density
+        )
 
     def onion_base(self) -> np.ndarray:
         """Return the onion's points"""
