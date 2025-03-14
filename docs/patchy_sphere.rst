@@ -186,6 +186,8 @@ We first apply :math:`\mathbf{q}_{i,1}`, then :math:`\mathbf{q}_{i,2}`
 Examples
 ----------
 
+.. _patch-sphere-ex:
+
 Examples
 ----------
 **The volume fraction:** :math:`\phi`

@@ -31,5 +31,23 @@ that all onions look different.
 Examples
 ----------------
 
-TODO: add examples
+We have already explored all variations of the patches themselves. The example below combines all previous examples 
+into one.
+
+.. figure:: images/patchy_box.png
+  :class: with-border
+  
+  A box with onions and patches. We show a front view, and an angled view.
+
+The structural features are:
+
+.. math::
+  L = 800\\
+  \phi = 0.05 \\
+  \mathbf{T}_\mu = [10, 7, 6, 5, 4]\\
+  \mathbf{T}_\sigma = [1.5, 1.2, 0.5, 0.8, 1.0]\\
+  \mathbf{d} = [0.0, 0.05, 0.1, 0.03, 0.2]\\
+  \mathbf{Y} = [300, 200, 900, 1500, 200, 3000]\\
+  X = 6\\
+  \rho_{\text{patch}} = 0.3
 

@@ -31,4 +31,11 @@ We use the radius :math:`R = \sum_{i} T_i`, area :math:`\mathbf{Y}`, patch numbe
 
 Examples
 ----------
-TODO: Add examples
+We already explored examples for the :ref:`patchy sphere <patch-sphere-ex>`, where we saw the patch density.
+We now have different patch sizes for each patch:
+
+.. figure:: images/patch_onion_size.png
+  :class: with-border
+  
+  A uniform onion with patches. All of the spheres have structural features :math:`\mathbf{T} = [50, 30, 10]`, :math:`\mathbf{d} = [1, 0.5, 0.25]`,
+  :math:`X = 8`, :math:`\rho_{\text{patch}} = 0.4`. They have a varying patch size, with each patch having a unique patch size.
