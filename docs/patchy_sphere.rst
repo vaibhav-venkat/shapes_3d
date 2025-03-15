@@ -42,26 +42,27 @@ not informative.
 Let's assume we have a radius :math:`L_i` and an area of :math:`Y_i`. 
 
 
-First, we find the patch's position :math:`x` in the plane.
+First, we find the patch's position :math:`\Delta x` in the plane.
 
 Let's decompose the patch so we can represent it in the plane. 
 We can select the patch to be centered at the polar angle 
-:math:`0` rad.
+:math:`0` rad. The arc radius is irrespective of the azimuthal angle.
 
-First, we know that :math:`x = R \sin \theta`, so let's find the polar angle :math:`\theta` of the patch's boundary (see Figure 1.). 
+First, we know that :math:`\Delta x = R \sin \theta`, so let's find the polar angle :math:`\theta` of the patch's boundary (see Figure 1.). 
 At any point :math:`l` within the radius :math:`L_i`:
 
 .. math::
    R \theta = l \\
    \Rightarrow \theta = \frac{l}{R}\\
-   \Rightarrow x = R \sin \left(\frac{l}{R} \right)
+ 
+Thus
 
-.. figure:: images/patches/radius_length.png
-   :width: 60%
+.. math::
+  L_i = R \cos^{-1} \left(1 - \frac{Y_i}{2 \pi R^2}\right)
 
-   Figure 1. The patch's radius in the plane is denoted as :math:`x`, its polar angle for its radius :math:`\theta`, and its radius :math:`l`. 
+  \Rightarrow \Delta x = R \sin \left(\frac{l}{R} \right)
 
-Next, take a small strip of the patch with a width of :math:`dl` (See figure 2). The area of the strip is :math:`2 \pi x dl`.
+Next, take a small strip of the patch with a width of :math:`dl` (see Figure 1.) . The area of the strip is :math:`2 \pi \Delta x dl`.
 (circumference times width). Thus, the total area :math:`Y_i` of the patch is:
 
 .. math::
@@ -70,15 +71,13 @@ Next, take a small strip of the patch with a width of :math:`dl` (See figure 2).
    = - 2 \pi R^2 \cos u \Big|_0^{L/R} \\
    = 2 \pi R^2 (1 - \cos (L / R))
 
-Thus
 
-.. math::
-  L_i = R \cos^{-1} \left(1 - \frac{Y_i}{2 \pi R^2}\right)
-
-.. figure:: images/patches/area_derive.png
+.. figure:: images/patches/radius_length.png
    :width: 60%
 
-   Figure 2. A small strip of the patch with width :math:`dl`, and circumference :math:`2 \pi x`
+   Figure 1. The patch's radius in the plane is denoted as :math:`\Delta x`, its polar angle for its radius :math:`\theta`, and its total radius :math:`L`. 
+
+
 
 Step 2: Generating a patch centered at the north pole
 ------------------------------------------------------
