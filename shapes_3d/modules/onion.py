@@ -45,7 +45,7 @@ class Onion:
         np.ndarray
             An array which contains the points
         """
-        pts = []
+        points = []
         current_radius: float = 0
         shell_id: int = 0
         for shell_id, radius in enumerate(self.radii):
@@ -60,6 +60,6 @@ class Onion:
             ).tolist()
             for row in shell:
                 row.append(shell_id + 1)
-            pts.extend(shell)
+            points.extend(shell)
             current_radius += radius
-        return np.array(pts)
+        return np.array(points)

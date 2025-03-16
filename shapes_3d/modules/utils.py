@@ -2,13 +2,15 @@ from pathlib import Path
 import numpy as np
 
 
-def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarray:
+def make_centers(
+    num_pts: int, min_pt: float, max_pt: float, min_dist: float
+) -> np.ndarray:
     """
-    Generate N random points in 3D space such that no two points are closer than min_L.
+    Generate random points in 3D space such that no two points are closer than min_dist.
 
     Parameters
     ----------
-    N : int
+    num_pts : int
         The number of points to generate.
     min_pt : float
         The minimum coordinate value for each point.
@@ -22,22 +24,22 @@ def make_centers(N: int, min_pt: float, max_pt: float, min_L: float) -> np.ndarr
     np.ndarray
         A array of shape (N, 3), each representing an (x, y, z) center
     """
-    pts: np.ndarray = np.zeros((N, 3))
-    num_pts: int = 0
-    while num_pts < N:
+    points: np.ndarray = np.zeros((num_pts, 3))
+    current_num_of_pts: int = 0
+    while current_num_of_pts < num_pts:
         # random point
         R: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
-        good = True
-        for p in pts:
-            if np.linalg.norm(R - p) <= min_L:
-                good = False
+        point_within_distance = True
+        for pt in points:
+            if np.linalg.norm(R - pt) <= min_dist:
+                point_within_distance = False
                 break
-        if good:
-            pts[num_pts] = R
-            num_pts += 1
-            if num_pts == 0 or (num_pts + 1) % 50 == 0 or num_pts == N - 1:
-                print("Made center n =", num_pts + 1, "out of", N)
-    return pts
+        if point_within_distance:
+            points[current_num_of_pts] = R
+            current_num_of_pts += 1
+            print("Made center n = ", current_num_of_pts, " out of ", num_pts)
+
+    return points
 
 
 def save_dump(points, filename: str, box_len: float):
