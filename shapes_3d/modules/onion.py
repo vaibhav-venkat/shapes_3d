@@ -45,11 +45,10 @@ class Onion:
         np.ndarray
             An array which contains the points
         """
-        points = []
+        points: list = []
         current_radius: float = 0
         shell_id: int = 0
         for shell_id, radius in enumerate(self.radii):
-            # create a new shell with the provided thickness, centered
             shell: list = (
                 Ellipsoid(
                     float(self.density[shell_id]),

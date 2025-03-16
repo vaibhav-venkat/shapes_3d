@@ -8,11 +8,6 @@ std_ts = np.array([1.5, 1.2, 0.5, 0.8, 1.0])
 density = np.array([0.0, 0.05, 0.1, 0.03, 0.2])
 L: float = 800
 VOL_FR: float = 0.05
-# ts = np.array([20, 10])
-# std_ts = np.array([3, 4])
-# L = 1000
-# VOL_FR = 0.1
-# density = np.array([0.1, 0.05])
 assert density.shape == std_ts.shape == ts.shape
 
 radii = []

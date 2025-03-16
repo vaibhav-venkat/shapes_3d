@@ -43,7 +43,7 @@ class Ellipsoid:
         z_inner_radius : float | None
             The z axis inner radius
         """
-        self.density = density
+        self.density: float = density
         if x_inner_radius is None:
             self.x_inner_radius: float = 0
         else:
@@ -72,12 +72,12 @@ class Ellipsoid:
             The points of the ellispoid in the 3d plane
         """
 
-        max_radius = max(self.x_outer_radius, self.z_outer_radius)
-        num_points = int(self.density * (2 * max_radius) ** 3)
-        points = np.random.uniform(
+        max_radius: float = max(self.x_outer_radius, self.z_outer_radius)
+        num_points: int = int(self.density * (2 * max_radius) ** 3)
+        points: np.ndarray = np.random.uniform(
             low=-max_radius, high=max_radius, size=(num_points, 3)
         )
-        norm_pts = points / np.array(
+        norm_pts: np.ndarray = points / np.array(
             [self.x_outer_radius, self.x_outer_radius, self.z_outer_radius]
         )
         if self.x_inner_radius == 0:
@@ -86,7 +86,7 @@ class Ellipsoid:
             norm_i = points / np.array(
                 [self.x_inner_radius, self.x_inner_radius, self.z_inner_radius]
             )
-        sd_o = np.sum(norm_pts**2, axis=1)
-        sd_i = np.sum(norm_i**2, axis=1)
-        inside = (sd_o <= 1) & (sd_i >= 1)
+        distance_outer: float = np.sum(norm_pts**2, axis=1)
+        distance_inner: float = np.sum(norm_i**2, axis=1)
+        inside = (distance_outer <= 1) & (distance_inner >= 1)
         return points[inside]

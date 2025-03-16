@@ -48,19 +48,21 @@ class PatchShell:
         arc_radius: float = self.radius * np.arccos(1 - temp)
 
         polar_change: float = arc_radius / self.radius
-        sampler = qmc.Sobol(d=2, scramble=True)
-        sobol_log_points = int(
+        sampler: qmc.Sobol = qmc.Sobol(d=2, scramble=True)
+        sobol_log_points: int = int(
             2 ** np.ceil(np.log2(num_pts))
         )  # Sobol needs points of 2^n
-        sampler = sampler.random(sobol_log_points)
+        sample: np.ndarray = sampler.random(sobol_log_points)
         patch_points: np.ndarray = np.zeros((sobol_log_points**2, 3))
 
-        current_point = 0
-        base_index = sampler[:, 0]
+        current_point: int = 0
+        base_index: np.ndarray = sample[:, 0]
 
         for curr_base in base_index:
-            polar_angle = np.arccos(1 - curr_base * (1 - np.cos(polar_change / 2)))
             all_theta: np.ndarray = np.random.uniform(0, 2 * np.pi, sobol_log_points)
+            polar_angle: float = np.arccos(
+                1 - curr_base * (1 - np.cos(polar_change / 2))
+            )
             for azimuthal_angle in all_theta:
                 position: np.ndarray = self.radius * np.array(
                     [
@@ -85,11 +87,11 @@ class PatchShell:
                         np.cos(final_azimuthal / 2),
                     ]
                 )
-                rotation_1 = Rot.from_quat(quaternion_y)
-                rotation_2 = Rot.from_quat(quaternion_z)
+                rotation_1: Rot = Rot.from_quat(quaternion_y)
+                rotation_2: Rot = Rot.from_quat(quaternion_z)
 
-                position_1 = rotation_1.apply(position)
-                final_position = rotation_2.apply(position_1)
+                position_1: np.ndarray = rotation_1.apply(position)
+                final_position: np.ndarray = rotation_2.apply(position_1)
 
                 patch_points[current_point] = final_position
                 current_point += 1
@@ -99,7 +101,7 @@ class PatchShell:
         """
         Make all the patches.
         """
-        patches = []
+        patches: list = []
         centers: np.ndarray = self.gen_centers()
 
         for i, (_, polar_angle, azimuthal_angle) in enumerate(centers):
@@ -114,6 +116,6 @@ class PatchShell:
             )
             patches.extend(patch)
 
-        random_rotation = Rot.from_quat(np.random.uniform(0, 1, size=4))
+        random_rotation: Rot = Rot.from_quat(np.random.uniform(0, 1, size=4))
         final_patches: np.ndarray = random_rotation.apply(patches)
         return np.array(final_patches)

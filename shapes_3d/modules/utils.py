@@ -27,15 +27,14 @@ def make_centers(
     points: np.ndarray = np.zeros((num_pts, 3))
     current_num_of_pts: int = 0
     while current_num_of_pts < num_pts:
-        # random point
-        R: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
+        random_radius: np.ndarray = np.random.uniform(min_pt, max_pt, 3)
         point_within_distance = True
         for pt in points:
-            if np.linalg.norm(R - pt) <= min_dist:
+            if np.linalg.norm(random_radius - pt) <= min_dist:
                 point_within_distance = False
                 break
         if point_within_distance:
-            points[current_num_of_pts] = R
+            points[current_num_of_pts] = random_radius
             current_num_of_pts += 1
             print("Made center n = ", current_num_of_pts, " out of ", num_pts)
 
@@ -62,7 +61,7 @@ def save_dump(points, filename: str, box_len: float):
         The function just writes to a file
     """
     print("dumping...")
-    num = sum(pt.shape[0] for pt in points)
+    num: float = sum(pt.shape[0] for pt in points)
     Path(filename).parent.mkdir(parents=True, exist_ok=True)
     with open(filename, "w") as f:
         f.write("ITEM: TIMESTEP\n0\n")
@@ -71,7 +70,7 @@ def save_dump(points, filename: str, box_len: float):
             f"ITEM: BOX BOUNDS pp pp pp\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n{-box_len//2} {box_len//2}\n"
         )
         f.write("ITEM: ATOMS id type x y z\n")
-        max_type = 0
+        max_type: int = 0
         for i in range(0, len(points)):
             if points[i].shape[1] == 4:
                 for j in range(points[i].shape[0]):
