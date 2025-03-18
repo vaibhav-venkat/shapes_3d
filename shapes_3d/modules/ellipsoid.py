@@ -27,10 +27,10 @@ class Ellipsoid:
         self,
         density: float,
         x_outer_radius: float,
-        x_inner_radius: float | None = None,
         y_outer_radius: float | None = None,
-        y_inner_radius: float | None = None,
         z_outer_radius: float | None = None,
+        x_inner_radius: float | None = None,
+        y_inner_radius: float | None = None,
         z_inner_radius: float | None = None,
     ):
         """

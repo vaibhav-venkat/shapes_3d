@@ -36,7 +36,12 @@ def make_centers(
         if point_within_distance:
             points[current_num_of_pts] = random_radius
             current_num_of_pts += 1
-            print("Made center n = ", current_num_of_pts, " out of ", num_pts)
+            if (
+                current_num_of_pts == 1
+                or current_num_of_pts % 50 == 0
+                or current_num_of_pts == num_pts
+            ):
+                print("Made center n = ", current_num_of_pts, " out of ", num_pts)
 
     return points
 
