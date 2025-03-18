@@ -54,6 +54,7 @@ class Ellipsoid:
             The z axis inner radius
         """
         self.density: float = density
+        assert x_outer_radius >= 0
         self.x_outer_radius: float = x_outer_radius
         self.x_inner_radius: float | None = x_inner_radius
         self.y_outer_radius: float | None = y_outer_radius
@@ -76,12 +77,17 @@ class Ellipsoid:
         x_inner: float = self.x_inner_radius or 0
         y_inner: float = self.y_inner_radius or x_inner
         z_inner: float = self.z_inner_radius or x_inner
+
         max_radius: float = max(x_outer, y_outer, z_outer)
-        num_points: int = int(self.density * (2 * max_radius) ** 3)
+        volume_box = (2 * max_radius) ** 3
+        num_points: int = int(self.density * volume_box)
+
         points: np.ndarray = np.random.uniform(
             low=-max_radius, high=max_radius, size=(num_points, 3)
         )
+
         norm_pts: np.ndarray = points / np.array([x_outer, y_outer, z_outer])
+
         if x_inner == 0:
             norm_i = np.ones(shape=points.shape)
         else:
