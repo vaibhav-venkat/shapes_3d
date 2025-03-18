@@ -16,7 +16,6 @@ class Parallelepiped:
         self.phi = phi
 
     def is_in_bounds(self, x_points, x_length, y_points, y_length, z_points) -> bool:
-        # TODO: make the code not look bad
         if self.theta == np.pi / 2:
             x_condition = (x_points >= 0) & (x_points <= x_length)
         else:
@@ -32,11 +31,17 @@ class Parallelepiped:
         return x_condition & y_condition
 
     def make_shell(
-        self, density: float, outer_thickness: np.ndarray, inner_thickness: np.ndarray
+        self,
+        density: float,
+        outer_thickness: np.ndarray,
+        inner_thickness: np.ndarray,
     ) -> np.ndarray:
         x_length = outer_thickness[0] + outer_thickness[2] * np.cos(self.theta)
         y_length = outer_thickness[1] + outer_thickness[2] * np.cos(self.phi)
         z_length = outer_thickness[2] * np.sin(self.theta) * np.sin(self.phi)
+        xi_length = inner_thickness[0] + inner_thickness[2] * np.cos(self.theta)
+        yi_length = inner_thickness[1] + inner_thickness[2] * np.cos(self.phi)
+        zi_length = inner_thickness[2] * np.sin(self.theta) * np.sin(self.phi)
         box_volume = x_length * y_length * z_length
         N: int = int(density * box_volume)
         x_points: np.ndarray = np.random.uniform(
@@ -50,11 +55,13 @@ class Parallelepiped:
             z_length / 2,
             N,
         )
-        is_in_outer = (
-            (np.abs(x_points) > (inner_thickness[0] / 2))
-            | (np.abs(y_points) > (inner_thickness[1] / 2))
-            | (np.abs(z_points) > (inner_thickness[2] / 2))
-        )
+        is_inner = self.is_in_bounds(
+            x_points + xi_length / 2,
+            inner_thickness[0],
+            y_points + yi_length / 2,
+            inner_thickness[1],
+            z_points + zi_length / 2,
+        ) & (np.abs(z_points) <= zi_length / 2)
         points_in_bounds = self.is_in_bounds(
             x_points + x_length / 2,
             outer_thickness[0],
@@ -62,7 +69,7 @@ class Parallelepiped:
             outer_thickness[1],
             z_points + z_length / 2,
         )
-        is_good = is_in_outer & points_in_bounds
+        is_good = np.bitwise_not(is_inner) & points_in_bounds
         x_points_outer: np.ndarray = x_points[is_good]
         y_points_outer: np.ndarray = y_points[is_good]
         z_points_outer: np.ndarray = z_points[is_good]
@@ -76,9 +83,10 @@ class Parallelepiped:
         current_length: np.ndarray = np.zeros(3)
         for i in range(self.thickness.shape[0]):
             shell: np.ndarray = self.make_shell(
-                self.density[i], current_length + self.thickness[i], current_length
+                self.density[i],
+                current_length + self.thickness[i],
+                current_length,
             ).tolist()
-
             for row in shell:
                 row.append(i + 1)
             points.extend(shell)
