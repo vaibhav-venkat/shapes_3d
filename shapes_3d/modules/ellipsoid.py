@@ -58,7 +58,7 @@ class Ellipsoid:
         self.x_inner_radius: float | None = x_inner_radius
         self.y_outer_radius: float | None = y_outer_radius
         self.y_inner_radius: float | None = y_inner_radius
-        self.z_outer_radius: float | None = z_inner_radius
+        self.z_outer_radius: float | None = z_outer_radius
         self.z_inner_radius: float | None = z_inner_radius
 
     def make_obj(self) -> np.ndarray:
