@@ -1,6 +1,7 @@
 import numpy as np
 
 
+# TODO: figure out a new name for ts so I don't have to spell it out
 class Parallelepiped:
     def __init__(
         self,
@@ -15,6 +16,7 @@ class Parallelepiped:
         self.phi = phi
 
     def is_in_bounds(self, x_points, x_length, y_points, y_length, z_points) -> bool:
+        # TODO: make the code not look bad
         if self.theta == np.pi / 2:
             x_condition = (x_points >= 0) & (x_points <= x_length)
         else:
