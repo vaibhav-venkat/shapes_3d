@@ -1,5 +1,7 @@
 from pathlib import Path
+import time
 import numpy as np
+import sys
 
 
 def make_centers(
@@ -36,12 +38,51 @@ def make_centers(
         if point_within_distance:
             points[current_num_of_pts] = random_radius
             current_num_of_pts += 1
-            if (
-                current_num_of_pts == 1
-                or current_num_of_pts % 50 == 0
-                or current_num_of_pts == num_pts
-            ):
-                print("Made center n = ", current_num_of_pts, " out of ", num_pts)
+            print(f"\rcenter {current_num_of_pts} out of {num_pts}", end="")
+            sys.stdout.flush()
+
+    return points
+
+
+def make_centers_iter(
+    num_pts: int, min_pt: float, max_pt: float, min_dist: np.ndarray
+) -> np.ndarray:
+    """
+    Iteratively generate random points in 3D space such that no two points are closer than their corresponding min_dist.
+
+    Parameters
+    ----------
+    num_pts : int
+        The number of points to generate.
+    min_pt : float
+        The minimum bound for each point.
+    max_pt : float
+        The maximum bound for each point.
+    min_dist: np.ndarray
+        The minimum distance (outward radius) for each point
+
+    Returns
+    -------
+    np.ndarray
+        A array of shape (N, 3), each representing an (x, y, z) center
+    """
+
+    points: np.ndarray = np.zeros((num_pts, 3))
+    i: int = 0
+    while i < num_pts:
+        random_radius: np.ndarray = np.random.uniform(
+            min_pt + min_dist[i], max_pt - min_dist[i], 3
+        )
+        point_within_distance = True
+        for j, pt in enumerate(points):
+            if np.linalg.norm(random_radius - pt) <= min_dist[i] + min_dist[j]:
+                point_within_distance = False
+                break
+        if point_within_distance:
+            points[i] = random_radius
+            i += 1
+            print(f"\rcenter {i} out of {num_pts}", end="")
+            sys.stdout.flush()
 
     return points
 

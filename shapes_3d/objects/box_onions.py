@@ -25,6 +25,7 @@ while current_volume < target:
         break
     radii.append(curr_sphere)
 radii = np.array(radii)
+print(radii)
 N: int = radii.shape[0]
 
 
