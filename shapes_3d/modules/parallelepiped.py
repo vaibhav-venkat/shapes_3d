@@ -1,7 +1,6 @@
 import numpy as np
 
 
-# TODO: figure out a new name for ts so I don't have to spell it out
 class Parallelepiped:
     def __init__(
         self,

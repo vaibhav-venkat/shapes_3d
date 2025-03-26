@@ -1,6 +1,6 @@
 import numpy as np
 from ..modules.ellipsoid import Ellipsoid
-from ..modules.utils import save_dump, make_centers
+from ..modules.utils import save_dump, make_centers_iter
 
 box_length = 1000
 outer_radius_mean = 30.0
@@ -43,11 +43,10 @@ while total_volume < target:
 R_outer = np.array(R_outer)
 R_inner = np.array(R_inner)
 num_pts = R_outer.shape[0]
-max_r = np.max(R_outer)
+
+dist: np.ndarray = R_outer
 print("particles:", num_pts)
-centers = make_centers(
-    num_pts, -box_length / 2 + max_r, box_length / 2 - max_r, 2 * max_r
-)
+centers: np.ndarray = make_centers_iter(num_pts, -box_length / 2, box_length / 2, dist)
 core_points = []
 shell_points = []
 for i in range(num_pts):

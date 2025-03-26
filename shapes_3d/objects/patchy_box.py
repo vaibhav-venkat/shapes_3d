@@ -10,7 +10,6 @@ VOL_FR: float = 0.05
 patch_den: float = 0.3
 Y: np.ndarray = np.array([300.0, 200.0, 900.0, 1500.0, 200.0, 3000.0])
 X: int = 6
-
 assert density.shape == std_ts.shape == ts.shape
 
 radii_list: list = []
