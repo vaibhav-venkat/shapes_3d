@@ -15,6 +15,7 @@ Structural features
 
 4. :math:`\phi` is the slant rotation in the :math:`yz` plane.
    :math:`\phi \in \left(0, \frac{\pi}{2}\right]`
+
 5. :math:`\theta = \phi = \frac{\pi}{2}` corresponds to a cuboid.
 
 
@@ -37,8 +38,8 @@ Shell-by-shell process
 For any shell :math:`i`, we first obtain the maximum distance in the :math:`x, y, z` 
 planes, which is **not** the length.
 We treat each length as a vector. The inner length vector is
-:math:`\mathbf{l}_{i,\text{inner}} = \sum_{j=0}^{i-1} L_j`, and the outer length 
-vector :math:`\mathbf{l}_{i, \text{outer}} = L_i + \mathbf{l}_{i, \text{inner}}`
+:math:`\mathbf{l}_{\text{inner}} = \sum_{j=0}^{i-1} L_j`, and the outer length 
+vector :math:`\mathbf{l}_{\text{outer}} = L_i + \mathbf{l}_{i, \text{inner}}`
 
 
 For the :math:`x` distance, this is simply the dot product 
@@ -57,24 +58,24 @@ Finally, we define the inner length's distance.
    z_{l, \text{inner}} = l_{z, \text{inner}} \sin \theta \sin \phi
 
 
-We use a rejection method, where we generate the points in the cuboid surrounding
-the parallelepiped, then keep the points inside the parallelepiped's range.
+We use a rejection method, where we generate the points in the cuboid encapsulating
+the parallelepiped, then only keep the points inside the parallelepiped's range.
 
 We generate 
-:math:`n = d_i V_{\text{outer}} = \rho(x_{\text{outer}}y_{\text{outer}}z_{\text{outer}})`
-points in the uniform range. Recall that :math:`d_i` is the current density. That is:
+:math:`n = d_i V_{\text{cuboid}} = \rho(x_{\text{outer}}y_{\text{outer}}z_{\text{outer}})`
+points in the uniform range. Recall that :math:`d_i` is the current density. Thus, we define:
 
 .. math::
-   \mathbf{U}_{x, \text{box}} \sim \text{Uniform} (\frac{-x_{l, \text{outer}}}{2}, \frac{x_{l, \text{outer}}}{2})\\
-   \mathbf{U}_{y, \text{box}} \sim \text{Uniform} (\frac{-y_{l, \text{outer}}}{2}, \frac{y_{l, \text{outer}}}{2})\\
-   \mathbf{U}_{z, \text{box}} \sim \text{Uniform} (\frac{-z_{l, \text{outer}}}{2}, \frac{z_{l, \text{outer}}}{2})
+   \mathbf{U}_{x, \text{cuboid}} \sim \text{Uniform} \left(n, \frac{-x_{l, \text{outer}}}{2}, \frac{x_{l, \text{outer}}}{2}\right)\\
+   \mathbf{U}_{y, \text{cuboid}} \sim \text{Uniform} \left(n, \frac{-y_{l, \text{outer}}}{2}, \frac{y_{l, \text{outer}}}{2}\right)\\
+   \mathbf{U}_{z, \text{cuboid}} \sim \text{Uniform} \left(n, \frac{-z_{l, \text{outer}}}{2}, \frac{z_{l, \text{outer}}}{2}\right)
 
 
-We apply the first restrictions (to keep within the parallelepiped's range), which 
+We apply the first restrictions to keep the points within the *outer* radius, which 
 are as follows:
 
 .. math::
-   \mathbf{U}_1 = \left\{ (x, y, z) \in \mathbf{U}_\text{box} \, \middle| \, \begin{array}{l}
+   \mathbf{U}_1 = \left\{ (x, y, z) \in \mathbf{U}_\text{cuboid} \, \middle| \, \begin{array}{l}
     0 \le  x - \frac{z}{\tan \theta} \le x_{l, \text{outer}}\\
     0 \le  y - \frac{z}{\tan \phi} \le y_{l, \text{outer}}\\
     |z| \le \frac{z_{l, \text{outer}}}{2}
@@ -85,7 +86,7 @@ we apply similar restrictions, exchanging the outer lengths with the inner lengt
 We instead **reject** any points that fall within
 the inner range.
 
-The resulting points will form the shell :math:`U_{i, \text{shell}}`
+The resulting points will form the shell :math:`\mathbf{U}_{i}`
 
 Example
 ===========
@@ -98,6 +99,6 @@ Example
   center image shows a complete parallelepiped with the same :math:`\theta` and :math:`\phi`.
   The right image shows a cross section of the :math:`xz` plane showcasing the :math:`\theta` angle.
 
-These images demonstrate how parallelepiped objects respond to the slant angle, with cross sections 
+This image demonstrates how parallelepiped objects respond to the slant angle, with cross sections 
 being used. The image on the right is more slanted than the left, despite :math:`\phi_\text{left} = \theta_\text{right}`,
 because of the larger :math:`x` length. The density and lengths are constant throughout the example.
