@@ -89,7 +89,7 @@ the inner range.
 The resulting points will form the shell :math:`\mathbf{U}_{i}`
 
 Example
-===========
+-----------
 
 .. figure:: images/parall_example.png
   :class: with-border
