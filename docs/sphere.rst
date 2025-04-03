@@ -1,7 +1,7 @@
 .. _uni-sphere:
 
 ===============
-Uniform sphere
+A sphere
 ===============
 
 

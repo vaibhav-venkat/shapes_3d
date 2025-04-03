@@ -8,7 +8,6 @@ axis_length_std: np.ndarray = np.array([5, 6, 3])
 volume_fraction = 0.05
 density = 0.02
 
-
 log_std_axis: np.ndarray = np.sqrt(
     np.log(1 + (axis_length_std / axis_length_mean) ** 2)
 )

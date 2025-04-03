@@ -1,6 +1,6 @@
 .. _patchy-onion:
 
-A uniform onion with patches
+An onion with patches
 ==============================
 
 Structural features

@@ -1,6 +1,6 @@
 .. _uni-onion:
 
-Uniform onion
+An onion
 ===============
 
 This structure is generated using :ref:`the Onion class <onion-class>`

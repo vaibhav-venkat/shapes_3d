@@ -1,6 +1,6 @@
 .. _box-spheres:
 
-Box with uniform two-shell spheres
+Box with core-corona spheres
 ===============================================
 
 
@@ -17,13 +17,31 @@ Structural features
 7. :math:`\rho_{o}` is the outer shell's density of scatters in scatters (points) per unit volume.
 8. :math:`\rho_i` is the inner shell's density of scatters in scatters (point) per unit volume.
 
-Schematic
-------------
+Schematic & Example
+---------------------
 
 .. figure:: images/Core-Corona-Spheroid.png
 
    The design of a two-shell sphere
 
+**The volume fraction:** :math:`\phi`
+
+.. figure:: images/box_with_spheres_volfr.png
+  :class: with-border
+  
+  A box with spheres with varying volume fractions
+
+The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
+We take some features as constants:
+
+.. math::
+  L = 1000\\
+  R_\mu = 30\\
+  R_\sigma = 5\\
+  r_\mu = 20\\
+  r_\sigma = 3\\
+  \rho_o  = 0.1\\
+  \rho_i = 0.05
 
 Converting the shell to thickness
 ----------------------------------
@@ -117,23 +135,3 @@ with thicknesses :math:`\mathbf{T} = [r_j, R_j - r_j]` and densities
 (essentially displacing the points from the origin to the center)
 to the final structure :math:`\mathbf{S}`.
 
-Examples
-----------
-**The volume fraction:** :math:`\phi`
-
-.. figure:: images/box_with_spheres_volfr.png
-  :class: with-border
-  
-  A box with spheres with varying volume fractions
-
-The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
-We take some features as constants:
-
-.. math::
-  L = 1000\\
-  R_\mu = 30\\
-  R_\sigma = 5\\
-  r_\mu = 20\\
-  r_\sigma = 3\\
-  \rho_o  = 0.1\\
-  \rho_i = 0.05

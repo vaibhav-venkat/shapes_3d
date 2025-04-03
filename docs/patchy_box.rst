@@ -14,21 +14,7 @@ Structural features
 8. :math:`\rho_\text{patch}` is the density of scatters for all patches, in scatters per unit area.
 
 
-There are two parts to this, the actual onions, and the patches on each onion
-
-Creating the onions
----------------------
-We use the exact same method as we did with the :ref:`box with onions <box-onion>`, 
-with the same structural features (and notation).
-
-Creating the patches
----------------------
-For each onion :math:`O`, we use the steps outlined in the :ref:`patchy onions <patchy-onion>`,
-with the same structural features. The randomization in step 3 combined with the different distributions ensures
-that all onions look different.
-
-
-Examples
+Example
 ----------------
 
 We have already explored all variations of the patches themselves. The example below combines all previous examples 
@@ -50,4 +36,18 @@ The structural features are:
   \mathbf{Y} = [300, 200, 900, 1500, 200, 3000]\\
   X = 6\\
   \rho_{\text{patch}} = 0.3
+
+There are two parts to this, the actual onions, and the patches on each onion
+
+Creating the onions
+---------------------
+We use the exact same method as we did with the :ref:`box with onions <box-onion>`, 
+with the same structural features (and notation).
+
+Creating the patches
+---------------------
+For each onion :math:`O`, we use the steps outlined in the :ref:`patchy onions <patchy-onion>`,
+with the same structural features. The randomization in step 3 combined with the different distributions ensures
+that all onions look different.
+
 

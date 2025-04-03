@@ -1,7 +1,7 @@
 .. _box-onion:
 
 ============================
-Box with uniform onions
+Box with onions
 ============================
 
 Read about :ref:`onions <uni-onion>` before this
@@ -14,6 +14,22 @@ Structural features
 4. :math:`\mathbf{T_\sigma}` is an vectorthat represents the standard deviation of the thicknesses .
 5. :math:`\mathbf{d}` is an vector that represents each shell's density of scatters. 
    Each density is represented in scatters (points) per unit volume.
+
+Example
+--------------------
+.. figure:: images/box_with_onions_volfr.png
+  :class: with-border
+  
+  A box of onions with varying volume fractions
+
+The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
+We take some features as constants:
+
+.. math::
+  L = 800\\
+  \mathbf{T}_\mu = [10.0, 7.0, 6.0, 5.0, 4.0]\\
+  \mathbf{T}_\sigma = [1.5, 1.2, 0.5, 0.8, 1.0]\\
+  \mathbf{d} = [0.0, 0.05, 0.01, 0.03, 0.2]
 
 The distribution of radii
 --------------------------
@@ -48,9 +64,7 @@ The total volume :math:`V_{tot}` is updated as well:
 .. math::
   V_{tot} \leftarrow V_{tot} + V
 
-
 This process continues until :math:`V_{tot} > \phi L^3`.
-
 **Step 3: Storing the thicknesses**
 
 The sequence of thicknesses will be stored as a matrix with shape :math:`(K, N)`, with :math:`K` being the number of shells.
@@ -82,20 +96,3 @@ with thicknesses :math:`\mathbf{T_i}` and densities :math:`\mathbf{d}`. Then, ad
 (essentially displacing the points from the origin to the center)
 to the final structure :math:`\mathbf{S}`.
 
-Example
------------
-**The volume fraction:** :math:`\phi`
-
-.. figure:: images/box_with_onions_volfr.png
-  :class: with-border
-  
-  A box of onions with varying volume fractions
-
-The range of volume fractions showcase how the number of particles depends on :math:`\phi`. 
-We take some features as constants:
-
-.. math::
-  L = 800\\
-  \mathbf{T}_\mu = [10.0, 7.0, 6.0, 5.0, 4.0]\\
-  \mathbf{T}_\sigma = [1.5, 1.2, 0.5, 0.8, 1.0]\\
-  \mathbf{d} = [0.0, 0.05, 0.01, 0.03, 0.2]

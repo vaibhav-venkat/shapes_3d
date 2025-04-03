@@ -1,4 +1,4 @@
-Uniform ellipsoid
+An ellipsoid
 ===================
 
 To avoid confusion, please read about the :ref:`uniform sphere <uni-sphere>`

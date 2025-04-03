@@ -1,4 +1,4 @@
-A uniform sphere with patches
+A sphere with patches
 ===============================
 
 
