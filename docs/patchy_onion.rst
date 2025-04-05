@@ -16,9 +16,7 @@ Schematic
 -----------
 .. figure:: images/onion_with_patch.png
  
-   The design of a patchy onion, with one patch labeled
-
-There are two components to the structure: the onion and the patches.
+   The design of a patchy onion
 
 Onion creation
 ----------------

@@ -13,9 +13,9 @@ Structural features
 Schematic
 -----------
 
+
 .. figure:: images/sphere_with_patch.png
-   
-   The design of a patchy sphere, with one patch labeled
+  :class: with-border
 
 There are two components to the structure, the sphere and the patches. 
 
@@ -189,8 +189,6 @@ Examples
 
 Examples
 ----------
-**The volume fraction:** :math:`\phi`
-
 .. figure:: images/patch_sphere_num.png
   :class: with-border
   
