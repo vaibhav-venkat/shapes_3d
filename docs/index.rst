@@ -21,6 +21,7 @@ crease-shapes documentation
    patchy_onion
    patchy_box
    parallelepiped
+   box_parral
 
 .. toctree::
    :maxdepth: 2

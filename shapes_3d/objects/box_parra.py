@@ -56,6 +56,7 @@ while current_volume < target:
 length: np.ndarray = np.array(length_list)
 theta: np.ndarray = np.array(theta_list)
 phi: np.ndarray = np.array(phi_list)
+print(length.shape)
 N: int = length.shape[0]
 print(f"N = {N} points")
 
