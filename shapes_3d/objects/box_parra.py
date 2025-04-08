@@ -4,10 +4,10 @@ from shapes_3d.modules.parallelepiped import Parallelepiped
 from ..modules.utils import make_centers_iter, save_dump
 
 VOLUME_FRACTION = 0.05
-BOX_LEN = 1000
+BOX_LEN = 800
 
 
-density: np.ndarray = np.full(2, 0.1)
+density: np.ndarray = np.array([0.1, 0.03])
 
 
 length_x_mean: np.ndarray = np.array([30.0, 20.0])
@@ -20,11 +20,11 @@ length_y_std: np.ndarray = np.array([1.0, 3.0])
 length_z_std: np.ndarray = np.array([2.0, 1.0])
 length_std: np.ndarray = np.array([length_x_std, length_y_std, length_z_std])
 
-theta_mean: float = np.pi / 6
-phi_mean: float = np.pi / 6
+theta_mean: float = np.pi / 3
+phi_mean: float = np.pi / 3
 
-theta_std: float = np.pi / 12
-phi_std: float = np.pi / 11
+theta_std: float = 0.2
+phi_std: float = 0.2
 
 
 log_length_std: np.ndarray = np.sqrt(np.log(1 + (length_std / length_mean) ** 2))
@@ -42,8 +42,10 @@ target = (BOX_LEN**3) * VOLUME_FRACTION
 current_volume: float = 0
 while current_volume < target:
     curr_length = np.random.lognormal(log_length_mean, log_length_std)
-    curr_theta: float = min(np.pi / 2, np.random.lognormal(theta_mean, theta_std))
-    curr_phi: float = min(np.pi / 2, np.random.lognormal(phi_mean, phi_std))
+    curr_theta: float = min(
+        np.pi / 2, np.random.lognormal(log_theta_mean, log_theta_std)
+    )
+    curr_phi: float = min(np.pi / 2, np.random.lognormal(log_phi_mean, log_phi_std))
     current_volume += (
         np.prod(np.sum(curr_length, axis=1)) * np.sin(curr_theta) * np.sin(curr_phi)
     )

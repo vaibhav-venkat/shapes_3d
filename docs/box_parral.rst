@@ -24,6 +24,13 @@ Structural features
 7. :math:`\theta_\sigma` and :math:`\varphi_\sigma` are the standard deviatoin of the 
    slant angle of :math:`\theta_\mu` and :math:`\varphi_\mu` respectively.
 
+Example
+-----------
+
+.. figure:: images/box_parral_ex.png
+  :class: with-border
+  
+  A box with parallelepipeds with varying slant angles
 
 The distribution of lengths
 ----------------------------
@@ -34,8 +41,8 @@ being used instead of :math:`\mathbf{T}_\mu` and :math:`\mathbf{T}_\sigma`. Note
 calculation of the volume for a parallelepiped is :math:`abc \sin \theta \sin \varphi` for 
 lengths :math:`a`, :math:`b`, :math:`c`.
 
-We obtain a vector of angles :math:`\boldsymbol{\theta}` and :math:`\boldsymbol{\varphi}`. Then, we
-apply a restriction such that every angle is between :math:`0` and :math:`\frac{\pi}{2}`. 
+We obtain a vector of angles :math:`\boldsymbol{\theta}` and :math:`\boldsymbol{\varphi}` based on a log normal 
+distribution. Then, we apply a restriction such that every angle is between :math:`0` and :math:`\frac{\pi}{2}`. 
 Essential, any angle :math:`\alpha = \max \left(0, \min\left(\alpha, \frac{\pi}{2}\right)\right)`.
 
 
@@ -50,3 +57,4 @@ The minimum distance between any two centers must be :
   d_{ij} = \sqrt{\left(\frac{a_i}{2}\right)^2 + \left(\frac{b_i}{2}\right)^2 + \left(\frac{c_i}{2}\right)^2} + \sqrt{\left(\frac{a_j}{2}\right)^2 + \left(\frac{b_j}{2}\right)^2 + \left(\frac{c_j}{2}\right)^2}\\
 
 
+Finally, at each center we generate a :ref:`parallelepiped <parral>`.
