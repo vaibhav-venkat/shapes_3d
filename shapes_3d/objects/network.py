@@ -1,11 +1,14 @@
 import numpy as np
 
+from shapes_3d.modules.cylinder import Cylinder
+from ..modules.ellipsoid import Ellipsoid
+from ..modules.utils import save_dump, make_centers_iter
 
 RADIUS_MEAN = 5.0
-RADIUS_STD = 0.0
-NODE_AMOUNT = 12
-
-BRANCH_LENGTH_MEAN = 2.0
+RADIUS_STD = 0.5
+NODE_AMOUNT = 5
+BOX_LENGTH = 200
+BRANCH_LENGTH_MEAN = 30.0
 BRANCH_LENGTH_STD = 0.0
 AMOUNT_PER_NODE = 3
 
@@ -29,36 +32,26 @@ length: np.ndarray = np.random.lognormal(
     branch_length_mean_log, branch_length_deviation_log, NODE_AMOUNT * AMOUNT_PER_NODE
 )
 
-edges_connected: np.ndarray = np.zeros(NODE_AMOUNT)
 
-adj_list: np.ndarray = np.full((NODE_AMOUNT, NODE_AMOUNT), False)
-
-start = 0
+centers_nodes: np.ndarray = make_centers_iter(
+    NODE_AMOUNT, -BOX_LENGTH / 2, BOX_LENGTH / 2, radii
+)
+centers_branches: np.ndarray = make_centers_iter(
+    NODE_AMOUNT * AMOUNT_PER_NODE, -BOX_LENGTH / 2, BOX_LENGTH / 2, length
+)
+points_nodes: list = []
+points_cylinder: list = []
 for i in range(NODE_AMOUNT):
-    for j in range(start, NODE_AMOUNT):
-        if i == j:
-            continue
-        if edges_connected[i] >= AMOUNT_PER_NODE:
-            break
-        if edges_connected[j] < AMOUNT_PER_NODE:
-            adj_list[i][j] = True
-            edges_connected[i] += 1
-            edges_connected[j] += 1
-        start = (start + 1) % NODE_AMOUNT
-# points: np.ndarray = np.full((NODE_AMOUNT, 3), None)
-# points[0] = np.zeros(3)
-#
-# for i in range(NODE_AMOUNT):
-#     for j in range(1, NODE_AMOUNT):
-#         if adj_list[i][j] and points[j][0] is None:
-#             theta: float = np.random.uniform(0, np.pi)
-#             phi: float = np.random.uniform(0, 2 * np.pi)
-#             point = (length[i] + radii[j] + radii[i]) * np.array(
-#                 [
-#                     np.sin(theta) * np.cos(phi),
-#                     np.sin(theta) * np.sin(phi),
-#                     np.cos(theta),
-#                 ]
-#             )
-#             points[j] = point
-#             print(np.linalg.norm(points[j] - points[i]))
+    node = Ellipsoid(0.4, radii[i])
+    node_shift = node.make_obj() + centers_nodes[i]
+    for point in node_shift:
+        points_nodes.append(point)
+for i in range(NODE_AMOUNT):
+    branch = Cylinder(0.4, length[i], 3.0, np.pi / 3, np.pi / 3)
+    branch_shift = branch.make_obj() + centers_branches[i]
+    for point in branch_shift:
+        points_cylinder.append(point)
+
+points_arr: np.ndarray = np.array(points_nodes)
+points_cylinder_arr: np.ndarray = np.array(points_cylinder)
+save_dump([points_arr, points_cylinder_arr], "out/network.dump", BOX_LENGTH)
