@@ -2,6 +2,7 @@ from pathlib import Path
 import time
 import numpy as np
 import sys
+import collections
 
 
 def make_centers(
@@ -128,3 +129,99 @@ def save_dump(points, filename: str, box_len: float):
                 for j, (x, y, z) in enumerate(points[i], start=1):
                     f.write(f"{j} {i + 1 + max_type} {x:.6f} {y:.6f} {z:.6f}\n")
         print("dumped to", filename)
+
+
+def is_connected(adj_list, N):
+    """
+    Checks if a graph is connected using Breadth-First Search (BFS).
+
+    Args:
+        adj_list (dict): The adjacency list of the graph.
+        N (int): The number of nodes in the graph.
+
+    Returns:
+        bool: True if the graph is connected, False otherwise.
+    """
+    if not adj_list or N == 0:
+        return True
+
+    # A queue for BFS, starting with node 0
+    queue = collections.deque([next(iter(adj_list))])
+    # A set to keep track of visited nodes
+    visited = {next(iter(adj_list))}
+
+    while queue:
+        node = queue.popleft()
+        for neighbor in adj_list[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+    # If the number of visited nodes is equal to the total number of nodes,
+    # the graph is connected.
+    return len(visited) == N
+
+
+def create_network_graph(N, M):
+    """
+    Generates a connected graph with N nodes where each node has approximately M branches.
+
+    Args:
+        N (int): The number of nodes in the graph.
+        M (int): The desired number of branches (degree) for each node.
+
+    Returns:
+        dict: An adjacency list representation of the graph, or None if
+              the graph cannot be created.
+    """
+    # --- Input Validation ---
+    if N * M % 2 != 0:
+        print(
+            "Error: The product of N (nodes) and M (branches) must be an even number."
+        )
+        return None
+    if M >= N:
+        print(
+            "Error: M must be less than N. A node cannot have more connections than available nodes."
+        )
+        return None
+    if N > 1 and M < 2:
+        print("Error: For a connected graph with N > 1, M must be at least 2.")
+        return None
+
+    adj_list = {i: [] for i in range(N)}
+    degrees = {i: 0 for i in range(N)}
+
+    # --- 1. Create a Hamiltonian cycle to guarantee connectivity ---
+    for i in range(N):
+        # Connect node i to node (i+1) mod N
+        neighbor = (i + 1) % N
+        adj_list[i].append(neighbor)
+        adj_list[neighbor].append(i)
+        degrees[i] += 1
+        degrees[neighbor] += 1
+
+    # --- 2. Add remaining edges randomly ---
+    potential_edges = []
+    for i in range(N):
+        for j in range(i + 2, N):
+            # Avoid edges that are part of the initial cycle
+            if not (i == 0 and j == N - 1):
+                potential_edges.append((i, j))
+
+    # Shuffle the potential edges to add them randomly
+    np.random.shuffle(potential_edges)
+
+    for node1, node2 in potential_edges:
+        # Add the edge if both nodes still need more connections
+        if degrees[node1] < M and degrees[node2] < M:
+            adj_list[node1].append(node2)
+            adj_list[node2].append(node1)
+            degrees[node1] += 1
+            degrees[node2] += 1
+
+    # This algorithm prioritizes connectivity and M-regularity but may result
+    # in some nodes having a degree slightly different from M if constraints are tight.
+    # A final check can be performed.
+
+    return adj_list
