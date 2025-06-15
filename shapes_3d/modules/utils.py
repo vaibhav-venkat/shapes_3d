@@ -22,7 +22,6 @@ def relax_network_positions(
     2. Node-Branch
     3. Branch-Branch
 
-    Too lazy to document all this in pydoc
     """
 
     positions = np.copy(initial_positions)
@@ -31,7 +30,7 @@ def relax_network_positions(
     branches = list(branch_to_length.keys())
     num_branches = len(branches)
 
-    print("Chill. Relaxing network layout with collision mitigation")
+    print("Relaxing network layout with collision mitigation")
     for i in range(iterations):
         forces = np.zeros_like(positions)
 
@@ -465,7 +464,6 @@ def create_network_graph(N: int, M: int) -> dict[int, list[int]] | None:
         return None
     if N > 2 and M < 2:
         print("Warning: For a connected graph with N > 2, M should be at least 2.")
-        # This is a warning, not an error, as the Hamiltonian cycle will ensure connectivity.
 
     adj_list = {i: [] for i in range(N)}
     degrees = {i: 0 for i in range(N)}
