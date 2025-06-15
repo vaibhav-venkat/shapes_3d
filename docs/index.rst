@@ -22,6 +22,7 @@ crease-shapes documentation
    patchy_box
    parallelepiped
    box_parral
+   network
 
 .. toctree::
    :maxdepth: 2

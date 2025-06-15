@@ -1,184 +1,103 @@
 import numpy as np
 
 from shapes_3d.modules.cylinder import Cylinder
-from ..modules.ellipsoid import Ellipsoid
+from shapes_3d.modules.ellipsoid import Ellipsoid
 from ..modules.utils import (
     create_network_graph,
     save_dump,
-    get_intersection_circle,
-    get_cartesian_relative,
+    relax_network_positions,
 )
 
-ERROR = 0.1
-RADIUS_MEAN = 6.0
+# CONSTANTS
+RADIUS_MEAN = 5.0
 RADIUS_STD = 0.5
-NODE_AMOUNT = 3
+NODE_AMOUNT = 8
 BOX_LENGTH = 200
-BRANCH_LENGTH_MEAN = 30.0
-BRANCH_LENGTH_STD = 0.0
+BRANCH_LENGTH_MEAN = 70.0
+BRANCH_LENGTH_STD = 5.0
 AMOUNT_PER_NODE = 2
-BRANCH_AMOUNT = NODE_AMOUNT
-CYLINDER_RADIUS = 3.0
+CYLINDER_RADIUS = 2.0
 DENSITY = 0.4
 
+radius_deviation_log = np.sqrt(np.log(1 + (RADIUS_STD / RADIUS_MEAN) ** 2))
+radius_mean_log = np.log(RADIUS_MEAN) - radius_deviation_log**2 / 2
 
-radius_deviation_log: np.ndarray = np.sqrt(np.log(1 + (RADIUS_STD / RADIUS_MEAN) ** 2))
-radius_mean_log: np.ndarray = np.log(RADIUS_MEAN) - radius_deviation_log**2 / 2
-
-branch_length_deviation_log: np.ndarray = np.sqrt(
+branch_length_deviation_log = np.sqrt(
     np.log(1 + (BRANCH_LENGTH_STD / BRANCH_LENGTH_MEAN) ** 2)
 )
-branch_length_mean_log: np.ndarray = (
-    np.log(BRANCH_LENGTH_MEAN) - branch_length_deviation_log**2 / 2
-)
-
+branch_length_mean_log = np.log(BRANCH_LENGTH_MEAN) - branch_length_deviation_log**2 / 2
 
 radii: np.ndarray = np.random.lognormal(
     radius_mean_log, radius_deviation_log, NODE_AMOUNT
 )
 
-length: np.ndarray = np.random.lognormal(
-    branch_length_mean_log, branch_length_deviation_log, BRANCH_AMOUNT
-)
-
-# (x_a, y_a, z_a, R, polar, azimuthal, i)
-centers_nodes: np.ndarray = np.zeros((NODE_AMOUNT, 7))
-# (x_a, y_a, z_a, R, polar, azimuthal)
-centers_branches: np.ndarray = np.zeros((BRANCH_AMOUNT, 6))
-angles_branches: np.ndarray = np.zeros((BRANCH_AMOUNT, 2))
-
-
 graph = create_network_graph(NODE_AMOUNT, AMOUNT_PER_NODE)
-
-visited_node: np.ndarray = np.full(NODE_AMOUNT, False)
-visited_node[0] = True
 if graph is None:
-    print("error when creating graph")
+    print("Error when creating graph. See previous messages")
     exit(1)
 
-branch_index: int = 0
+branches: list[tuple[int, int]] = []
+visited_edges: set[tuple[int, int]] = set()
+for node1 in range(NODE_AMOUNT):
+    for node2 in graph.get(node1, []):
+        edge: tuple[int, int] = (node1, node2) if node1 <= node2 else (node2, node1)
+        if edge not in visited_edges:
+            branches.append(edge)
+            visited_edges.add(edge)
 
+BRANCH_AMOUNT = len(branches)
+target_lengths: np.ndarray = np.random.lognormal(
+    branch_length_mean_log, branch_length_deviation_log, BRANCH_AMOUNT
+)
+branch_to_length = {branches[k]: target_lengths[k] for k in range(BRANCH_AMOUNT)}
 
-for primary_node in range(NODE_AMOUNT):
-    branches_in_node = graph.get(primary_node)
-    if branches_in_node is None:
-        continue
-    for secondary_node in branches_in_node:
-        if secondary_node <= primary_node:
-            continue
-        primary_cartesian_coordinates: np.ndarray = get_cartesian_relative(
-            centers_nodes[primary_node]
-        )
-        branch_effective_radius: float = radii[primary_node] + length[branch_index] / 2
-        if not visited_node[secondary_node]:
-            polar: float = np.random.uniform(0, np.pi)
-            azimuthal: float = np.random.uniform(0, np.pi)
+# close to the origin
+initial_node_centers = np.random.uniform(-20, 20, (NODE_AMOUNT, 3))
 
-            angles_branches[branch_index] = np.array([polar, azimuthal])
-            node_effective_radius: float = radii[primary_node] + length[branch_index]
-            centers_nodes[secondary_node] = np.concatenate(
-                (
-                    primary_cartesian_coordinates,
-                    np.array([node_effective_radius, polar, azimuthal, branch_index]),
-                )
-            )
-            centers_branches[branch_index] = np.concatenate(
-                (
-                    primary_cartesian_coordinates,
-                    np.array([branch_effective_radius, polar, azimuthal]),
-                )
-            )
-        else:
-            bound_sphere_radius = centers_nodes[primary_node][3]
-            fictitious_sphere_radius = radii[secondary_node] + length[branch_index]
+# node 0 (first node) always starts at origin for consistency
+initial_node_centers[0] = np.array([0.0, 0.0, 0.0])
 
-            secondary_center: np.ndarray = centers_nodes[secondary_node]
-            secondary_radius = secondary_center[3]
-            secondary_polar_angle = secondary_center[4]
-            secondary_azimuthal_angle = secondary_center[5]
-
-            secondary_cartesian: np.ndarray = get_cartesian_relative(
-                centers_nodes[secondary_node]
-            )
-            primary_cartesian = np.array(centers_nodes[primary_node][:3])
-            dist = np.linalg.norm(primary_cartesian - secondary_cartesian)
-            if np.abs(dist - fictitious_sphere_radius) > ERROR:
-                circle_spherical_coordinates = get_intersection_circle(
-                    np.pi / 2,
-                    bound_sphere_radius,
-                    fictitious_sphere_radius,
-                    primary_cartesian,
-                    secondary_cartesian,
-                )
-                if circle_spherical_coordinates is not None:
-                    _, circle_polar_angle, circle_azimuthal_angle = (
-                        circle_spherical_coordinates
-                    )
-                    centers_nodes[primary_node][4] = circle_polar_angle
-                    centers_nodes[primary_node][5] = circle_azimuthal_angle
-
-                    primary_cartesian_coordinates: np.ndarray = get_cartesian_relative(
-                        centers_nodes[primary_node]
-                    )
-                    difference_between = (
-                        secondary_cartesian - primary_cartesian_coordinates
-                    )  # (dx, dy, dz)
-
-                    dist = np.linalg.norm(difference_between)
-
-                    azimuthal = np.arctan2(difference_between[1], difference_between[0])
-                    polar = np.arccos(difference_between[2] / dist)
-
-                    centers_branches[branch_index] = np.concatenate(
-                        (
-                            primary_cartesian_coordinates,
-                            np.array([branch_effective_radius, polar, azimuthal]),
-                        )
-                    )
-                    angles_branches[branch_index] = np.array([polar, azimuthal])
-
-                    difference_between_adjusted = (
-                        primary_cartesian_coordinates - centers_nodes[primary_node][:3]
-                    )
-                    dist_adjusted = np.linalg.norm(difference_between_adjusted)
-                    azimuthal = np.arctan2(
-                        difference_between_adjusted[1], difference_between_adjusted[0]
-                    )
-                    polar = np.arccos(difference_between_adjusted[2] / dist_adjusted)
-                    associated_branch_idx = int(centers_nodes[primary_node][6])
-                    centers_branches[associated_branch_idx][4] = polar
-                    centers_branches[associated_branch_idx][5] = azimuthal
-                    angles_branches[associated_branch_idx][0] = polar
-                    angles_branches[associated_branch_idx][1] = azimuthal
-        visited_node[secondary_node] = True
-        branch_index += 1
+final_node_positions = relax_network_positions(
+    initial_positions=initial_node_centers,
+    graph=graph,
+    branch_to_length=branch_to_length,
+    node_radii=radii,
+    cylinder_radius=CYLINDER_RADIUS,
+    iterations=20000,
+    learning_rate=0.02,
+    repulsion_strength=7.0,
+)
 
 points_nodes: list = []
-points_cylinder: list = []
-for primary_node in range(NODE_AMOUNT):
-    node = Ellipsoid(DENSITY, radii[primary_node])
-    primary_cartesian_coordinates: np.ndarray = get_cartesian_relative(
-        centers_nodes[primary_node]
-    )
-    node_shift = node.make_obj() + primary_cartesian_coordinates
-    for point in node_shift:
-        points_nodes.append(point)
-for primary_node in range(BRANCH_AMOUNT):
-    branch = Cylinder(
-        DENSITY,
-        length[primary_node],
-        CYLINDER_RADIUS,
-        angles_branches[primary_node][0],
-        angles_branches[primary_node][1],
-    )
-    primary_cartesian_coordinates: np.ndarray = get_cartesian_relative(
-        centers_branches[primary_node]
-    )
-    branch_shift = branch.make_obj() + primary_cartesian_coordinates
-    for point in branch_shift:
-        points_cylinder.append(point)
+for i in range(NODE_AMOUNT):
+    node = Ellipsoid(DENSITY, radii[i])
+    node_points = node.make_obj() + final_node_positions[i]
+    points_nodes.extend(node_points)
 
+points_branches: list = []
+for i, (node1, node2) in enumerate(branches):
+
+    pos1 = final_node_positions[node1]
+    pos2 = final_node_positions[node2]
+
+    vec_diff = pos2 - pos1
+    dist = np.linalg.norm(vec_diff)
+
+    if dist < 1e-6:
+        continue
+
+    center_pos = (pos1 + pos2) / 2.0
+
+    # tan(azi) = y/x
+    azimuthal = np.arctan2(vec_diff[1], vec_diff[0])
+    polar = np.arccos(vec_diff[2] / dist)
+
+    branch = Cylinder(DENSITY, float(dist), CYLINDER_RADIUS, polar, azimuthal)
+    branch_points = branch.make_obj() + center_pos
+    points_branches.extend(branch_points)
 
 points_arr: np.ndarray = np.array(points_nodes)
-points_cylinder_arr: np.ndarray = np.array(points_cylinder)
+points_cylinder_arr: np.ndarray = np.array(points_branches)
 save_dump([points_arr, points_cylinder_arr], "out/network.dump", BOX_LENGTH)
+
+print("Done.")

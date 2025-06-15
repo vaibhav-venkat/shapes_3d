@@ -8,6 +8,28 @@
 import os
 import sys
 import sphinx_rtd_theme
+from recommonmark.parser import CommonMarkParser
+
+myst_enable_extensions = [
+    "amsmath",
+    "attrs_inline",
+    "colon_fence",
+    "deflist",
+    "dollarmath",
+    "fieldlist",
+    "html_admonition",
+    "html_image",
+    "linkify",
+    "replacements",
+    "smartquotes",
+    "strikethrough",
+    "substitution",
+    "tasklist",
+]
+
+extensions = ["myst_parser"]
+source_suffix = [".rst", ".md"]
+source_parsers = {".md": CommonMarkParser}
 
 sys.path.insert(0, os.path.abspath("../"))
 
@@ -19,7 +41,7 @@ release = "0.1"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.mathjax"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.mathjax", "myst_parser"]
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/shapes_3d/objects"]

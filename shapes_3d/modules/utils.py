@@ -5,108 +5,281 @@ import sys
 import collections
 
 
-def get_intersection_circle(t, R1, R2, c1, c2):
+def relax_network_positions(
+    initial_positions: np.ndarray,
+    graph: dict,
+    branch_to_length: dict,
+    node_radii: np.ndarray,
+    cylinder_radius: float,
+    iterations: int = 2000,
+    learning_rate: float = 0.05,
+    repulsion_strength: float = 2.5,
+    force_stop_threshold: float = 1e-5,
+) -> np.ndarray:
     """
-    Calculates the spherical coordinates of a point on the intersection circle of two spheres.
+    Adjusts node positions with full collision avoidance:
+    1. Node-Node
+    2. Node-Branch
+    3. Branch-Branch
 
-    The spherical coordinates (rho, theta, phi) are relative to the center of the first sphere (c1).
+    Too lazy to document all this in pydoc
+    """
+
+    positions = np.copy(initial_positions)
+    num_nodes = len(positions)
+
+    branches = list(branch_to_length.keys())
+    num_branches = len(branches)
+
+    print("Chill. Relaxing network layout with collision mitigation")
+    for i in range(iterations):
+        forces = np.zeros_like(positions)
+
+        # Spring Forces
+        for node1, node2 in branches:
+            target_length = branch_to_length[(node1, node2)]
+            vec = positions[node2] - positions[node1]
+            dist = np.linalg.norm(vec)
+
+            # randomized emergency repulsion
+            # otherwise it will explode
+            if dist < 1e-6:
+                dist = 1e-6
+                vec = np.random.rand(3) * 1e-6
+
+            error = dist - target_length
+            direction = vec / dist
+            # total force should be double this, but we apply it to both
+            # F = kx, k = learning_rate and dx = error
+            force_vec = learning_rate * error * direction / 2.0
+            forces[node1] += force_vec
+            forces[node2] -= force_vec
+
+        # Node-Node Repulsion
+        for n1 in range(num_nodes):
+            for n2 in range(n1 + 1, num_nodes):
+                # some breathing room
+                min_dist = node_radii[n1] + node_radii[n2] + 0.1
+                vec = positions[n2] - positions[n1]
+                dist = np.linalg.norm(vec)
+                if dist < 1e-6:
+                    dist = 1e-6
+                    vec = np.random.rand(3) * 1e-6
+                if dist < min_dist:
+                    overlap = min_dist - dist
+                    direction = vec / dist
+                    repulsion = (
+                        learning_rate * repulsion_strength * overlap * direction / 2.0
+                    )
+                    forces[n1] -= repulsion
+                    forces[n2] += repulsion
+
+        # Node-Branch Repulsion
+        for node_k in range(num_nodes):
+            for branch_i, branch_j in branches:
+                # don't repel if it is the node's own branch
+                if node_k == branch_i or node_k == branch_j:
+                    continue
+                dist, closest_pt = point_segment_distance(
+                    positions[node_k], positions[branch_i], positions[branch_j]
+                )
+                min_allowed = node_radii[node_k] + cylinder_radius + 0.1
+                if dist < min_allowed:
+                    overlap = min_allowed - dist
+                    direction = (
+                        (positions[node_k] - closest_pt) / dist
+                        if dist > 1e-6
+                        else np.random.rand(3)
+                    )
+                    force_on_node = (
+                        learning_rate * repulsion_strength * overlap * direction
+                    )
+                    forces[node_k] += force_on_node
+                    vec_branch = positions[branch_j] - positions[branch_i]
+                    len_sq = np.dot(vec_branch, vec_branch)
+                    t = (
+                        np.dot(closest_pt - positions[branch_i], vec_branch) / len_sq
+                        if len_sq > 1e-12
+                        else 0.5
+                    )
+                    forces[branch_i] -= force_on_node * (1.0 - t)
+                    forces[branch_j] -= force_on_node * t
+
+        # Branch-Branch
+        min_branch_dist = 2 * cylinder_radius
+        for b1_idx in range(num_branches):
+            for b2_idx in range(b1_idx + 1, num_branches):
+                n1, n2 = branches[b1_idx]
+                n3, n4 = branches[b2_idx]
+
+                # Skip if branches share a node
+                if n1 in (n3, n4) or n2 in (n3, n4):
+                    continue
+
+                dist, closest_p1, closest_p2 = segment_segment_distance(
+                    positions[n1], positions[n2], positions[n3], positions[n4]
+                )
+
+                if dist < min_branch_dist:
+                    overlap = min_branch_dist - dist
+                    if dist < 1e-6:
+                        dist = 1e-6
+                        direction = np.random.rand(3)
+                    else:
+                        direction = (closest_p1 - closest_p2) / dist
+
+                    total_force = (
+                        learning_rate * repulsion_strength * overlap * direction
+                    )
+
+                    # Distribute this force to the 4 nodes
+                    # branch 1
+                    force_b1 = total_force / 2.0
+                    vec_b1 = positions[n2] - positions[n1]
+                    len_sq_b1 = np.dot(vec_b1, vec_b1)
+                    s = (
+                        np.dot(closest_p1 - positions[n1], vec_b1) / len_sq_b1
+                        if len_sq_b1 > 1e-12
+                        else 0.5
+                    )
+                    forces[n1] += force_b1 * (1.0 - s)
+                    forces[n2] += force_b1 * s
+
+                    # Force on branch 2
+                    force_b2 = -total_force / 2.0
+                    vec_b2 = positions[n4] - positions[n3]
+                    len_sq_b2 = np.dot(vec_b2, vec_b2)
+                    t = (
+                        np.dot(closest_p2 - positions[n3], vec_b2) / len_sq_b2
+                        if len_sq_b2 > 1e-12
+                        else 0.5
+                    )
+                    forces[n3] += force_b2 * (1.0 - t)
+                    forces[n4] += force_b2 * t
+
+        # Anchor the first node and update positions
+        forces[0] = 0.0
+        positions += forces
+
+        # Check for convergence
+        max_movement = np.max(np.linalg.norm(forces, axis=1))
+        if max_movement < force_stop_threshold:
+            print(f"\nConvergence reached at iteration {i+1}.")
+            break
+        if (i + 1) % 20 == 0:
+            print(
+                f"\rIteration {i+1}/{iterations}, Max Movement: {max_movement:.6f}",
+                end="",
+            )
+
+    print("\nRelaxation complete.")
+    return positions
+
+
+def segment_segment_distance(
+    p1: np.ndarray, q1: np.ndarray, p2: np.ndarray, q2: np.ndarray
+) -> tuple[float, np.ndarray, np.ndarray]:
+    """
+    Calculates the shortest distance between two line segments (p1,q1) and (p2,q2).
 
     Args:
-        t (float): The parametric variable, typically in the range [0, 2*pi],
-                   which defines the position on the circle.
-        R1 (float): Radius of the first sphere.
-        R2 (float): Radius of the second sphere.
-        c1 (np.ndarray): A 3-element numpy array for the center of the first sphere (x1, y1, z1).
-        c2 (np.ndarray): A 3-element numpy array for the center of the second sphere (x2, y2, z2).
+        p1, q1 (np.ndarray): Endpoints of the first segment.
+        p2, q2 (np.ndarray): Endpoints of the second segment.
 
     Returns:
-        tuple: A tuple (rho, theta, phi) representing the spherical coordinates
-               of the point on the circle with respect to c1.
-               - rho: Radial distance (will always be R1).
-               - theta: Polar angle (from the Z-axis, in radians, [0, pi]).
-               - phi: Azimuthal angle (in the XY-plane from the X-axis, in radians, [-pi, pi]).
-               Returns None if the spheres do not intersect in a circle.
+        tuple[float, np.ndarray, np.ndarray]:
+            - The shortest distance between the segments.
+            - The closest point on the first segment.
+            - The closest point on the second segment.
     """
-    # Ensure inputs are numpy arrays for vector operations
-    c1 = np.asarray(c1, dtype=float)
-    c2 = np.asarray(c2, dtype=float)
+    u = q1 - p1
+    v = q2 - p2
+    w = p1 - p2
 
-    # === Step 1: Pre-computation and Validation ===
+    a = np.dot(u, u)  # always >= 0
+    b = np.dot(u, v)
+    c = np.dot(v, v)  # always >= 0
+    d = np.dot(u, w)
+    e = np.dot(v, w)
 
-    # Vector from center 1 to center 2
-    v = c2 - c1
+    D = a * c - b * b
 
-    # Distance between centers
-    d = np.linalg.norm(v)
+    if D < 1e-7:
+        s_c = 0.0
+    else:
+        s_c = b * e - c * d
 
-    # Check for valid intersection
-    # No intersection if centers are too far apart or one sphere is inside the other.
-    # Also handles the case of concentric spheres (d=0).
-    if not (abs(R1 - R2) < d < (R1 + R2)):
-        # You can raise an error or return None based on desired behavior
-        # raise ValueError("Spheres do not intersect in a circle.")
-        return None
+    # Clamp parameters to the [0, 1] range for segments
+    s = np.clip(s_c / D, 0.0, 1.0) if D > 1e-7 else 0.0
 
-    # === Step 2: Find the Circle's Center and Radius ===
+    # Recalculate t for the clamped s
+    t_nom = b * s + e
+    if t_nom < 0.0:
+        t = 0.0
+        s_nom = -d
+        if s_nom < 0.0:
+            s = 0.0
+        elif s_nom > a:
+            s = 1.0
+        else:
+            s = s_nom / a if a > 1e-7 else 0.0
+    elif t_nom > c:
+        t = 1.0
+        s_nom = b - d
+        if s_nom < 0.0:
+            s = 0.0
+        elif s_nom > a:
+            s = 1.0
+        else:
+            s = s_nom / a if a > 1e-7 else 0.0
+    else:
+        t = t_nom / c if c > 1e-7 else 0.0
 
-    # Distance from c1 to the plane of the intersection circle
-    # This is derived from the law of cosines.
-    d1 = (R1**2 - R2**2 + d**2) / (2 * d)
+    closest_point1 = p1 + s * u
+    closest_point2 = p2 + t * v
+    distance = np.linalg.norm(closest_point1 - closest_point2)
 
-    # The radius of the intersection circle
-    r_circ = np.sqrt(R1**2 - d1**2)
+    return float(distance), closest_point1, closest_point2
 
-    # The unit vector in the direction from c1 to c2
-    u_hat = v / d
 
-    # The center of the intersection circle in Cartesian coordinates
-    c_circ = c1 + d1 * u_hat
+def point_segment_distance(
+    p: np.ndarray, a: np.ndarray, b: np.ndarray
+) -> tuple[float, np.ndarray]:
+    """
+    Calculates the shortest distance between a point p and a line defined by a and b.
 
-    # === Step 3: Create an Orthonormal Basis for the Circle's Plane ===
+    Args:
+        p (np.ndarray): The 3D coordinates of the point.
+        a (np.ndarray): The 3D coordinates of the start of the segment.
+        b (np.ndarray): The 3D coordinates of the end of the segment.
 
-    # We need two orthogonal vectors (w1, w2) that lie in the circle's plane.
-    # The normal to this plane is u_hat.
+    Returns:
+        tuple[float, np.ndarray]:
+            - The shortest distance.
+            - The coordinates of the closest point on the segment to p.
+    """
+    # line segment
+    ab = b - a
 
-    # Find a temporary vector that is not parallel to u_hat
-    temp_vec = np.array([0.0, 0.0, 1.0])
-    if np.allclose(np.abs(np.dot(u_hat, temp_vec)), 1.0):
-        # u_hat is parallel to the z-axis, so use x-axis instead
-        temp_vec = np.array([1.0, 0.0, 0.0])
+    ap = p - a
 
-    # Use cross product to find the first basis vector in the plane
-    w1_hat = np.cross(u_hat, temp_vec)
-    w1_hat /= np.linalg.norm(w1_hat)
+    len_sq_ab = np.dot(ab, ab)
 
-    # The second basis vector is the cross product of the normal and the first basis vector
-    w2_hat = np.cross(u_hat, w1_hat)
-    # This will already be a unit vector since u_hat and w1_hat are orthogonal unit vectors.
+    # If the segment is just a point (a and b are the same)
+    if len_sq_ab < 1e-12:
+        return float(np.linalg.norm(ap)), a
 
-    # === Step 4: Generate the Point in Cartesian Coordinates ===
+    t = np.dot(ap, ab) / len_sq_ab
 
-    # Parametrically define the point P on the circle
-    # This point is in the global Cartesian coordinate system
-    P_cartesian = c_circ + r_circ * (np.cos(t) * w1_hat + np.sin(t) * w2_hat)
+    if t < 0.0:  # behind point a
+        closest_point = a
+    elif t > 1.0:  # ahead of point b
+        closest_point = b
+    else:  # within the segement, just perpendicular
+        closest_point = a + t * ab
 
-    # === Step 5: Convert to Spherical Coordinates Relative to c1 ===
-
-    # First, get the vector from c1 to our point P
-    p_vec_relative_to_c1 = P_cartesian - c1
-
-    # Now, convert this relative Cartesian vector to spherical coordinates
-    px, py, pz = p_vec_relative_to_c1
-
-    # rho: radial distance. This should be extremely close to R1 by definition.
-    rho = np.linalg.norm(p_vec_relative_to_c1)
-
-    # theta: polar angle (inclination)
-    # Angle from the positive z-axis. arccos is safe since rho is non-zero.
-    theta = np.arccos(pz / rho)
-
-    # phi: azimuthal angle
-    # Angle in the xy-plane from the positive x-axis. atan2 handles all quadrants.
-    phi = np.arctan2(py, px)
-
-    return rho, theta, phi
+    distance = np.linalg.norm(p - closest_point)
+    return float(distance), closest_point
 
 
 def make_centers(
@@ -266,7 +439,7 @@ def is_connected(adj_list, N):
     return len(visited) == N
 
 
-def create_network_graph(N, M):
+def create_network_graph(N: int, M: int) -> dict[int, list[int]] | None:
     """
     Generates a connected graph with N nodes where each node has approximately M branches.
 
@@ -278,7 +451,8 @@ def create_network_graph(N, M):
         dict: An adjacency list representation of the graph, or None if
               the graph cannot be created.
     """
-    # --- Input Validation ---
+    if N <= 0:
+        return {}
     if N * M % 2 != 0:
         print(
             "Error: The product of N (nodes) and M (branches) must be an even number."
@@ -289,57 +463,37 @@ def create_network_graph(N, M):
             "Error: M must be less than N. A node cannot have more connections than available nodes."
         )
         return None
-    if N > 1 and M < 2:
-        print("Error: For a connected graph with N > 1, M must be at least 2.")
-        return None
+    if N > 2 and M < 2:
+        print("Warning: For a connected graph with N > 2, M should be at least 2.")
+        # This is a warning, not an error, as the Hamiltonian cycle will ensure connectivity.
 
     adj_list = {i: [] for i in range(N)}
     degrees = {i: 0 for i in range(N)}
 
-    # --- 1. Create a Hamiltonian cycle to guarantee connectivity ---
+    # 1. Create a Hamiltonian cycle to guarantee connectivity
     for i in range(N):
-        # Connect node i to node (i+1) mod N
         neighbor = (i + 1) % N
-        adj_list[i].append(neighbor)
-        adj_list[neighbor].append(i)
-        degrees[i] += 1
-        degrees[neighbor] += 1
+        if neighbor not in adj_list[i]:
+            adj_list[i].append(neighbor)
+            adj_list[neighbor].append(i)
+            degrees[i] += 1
+            degrees[neighbor] += 1
 
-    # --- 2. Add remaining edges randomly ---
+    # 2. Add remaining edges randomly
     potential_edges = []
     for i in range(N):
-        for j in range(i + 2, N):
-            # Avoid edges that are part of the initial cycle
-            if not (i == 0 and j == N - 1):
+        for j in range(i + 1, N):
+            # Add edge if it doesn't exist yet
+            if j not in adj_list[i]:
                 potential_edges.append((i, j))
 
-    # Shuffle the potential edges to add them randomly
     np.random.shuffle(potential_edges)
 
     for node1, node2 in potential_edges:
-        # Add the edge if both nodes still need more connections
         if degrees[node1] < M and degrees[node2] < M:
             adj_list[node1].append(node2)
             adj_list[node2].append(node1)
             degrees[node1] += 1
             degrees[node2] += 1
 
-    # This algorithm prioritizes connectivity and M-regularity but may result
-    # in some nodes having a degree slightly different from M if constraints are tight.
-    # A final check can be performed.
-
     return adj_list
-
-
-def get_cartesian_relative(arr: np.ndarray) -> np.ndarray:
-
-    radius_pos_i = arr[3]
-    polar_pos_i = arr[4]
-    azimuthal_pos_i = arr[5]
-    return arr[:3] + radius_pos_i * np.array(
-        [
-            np.sin(polar_pos_i) * np.cos(azimuthal_pos_i),
-            np.sin(polar_pos_i) * np.sin(azimuthal_pos_i),
-            np.cos(polar_pos_i),
-        ]
-    )
