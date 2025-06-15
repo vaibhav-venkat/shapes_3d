@@ -2,3 +2,6 @@ numpy
 scipy
 sphinx
 sphinx-rtd-theme
+recommonmark
+myst_parser
+linkify-it-py
