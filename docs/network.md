@@ -374,13 +374,74 @@ the shortest distance between their line segments is greater than $2 R_c$
   $$ L_1 (s) = \mathbf{P}_1 + s \cdot \mathbf{u}, \quad \mathbf{u} = \mathbf{Q}_1 - \mathbf{P}_1 \\
      L_2(t) = \mathbf{P}_2 + t \cdot \mathbf{v}, \quad \mathbf{v} = \mathbf{Q}_2 - \mathbf{P}_2$$
 
-  The squared distance between any two points on the line is $D(s, t)^2 = \Vert L_1(s) - L_2 (t) \Vert ^2$.
+  The vector connecting any two points along these lines is 
+  $\mathbf{w}(s, t) = L_1(s) - L_2(t)$. The squared distance between any two points on the line is $D^2 = \mathbf{w}(s, t) \cdot \mathbf{w}(s, t)$.
 
-  To find the minimum distance, we solve the system of equations: $\frac{\partial D^2}{\partial t} = 0$ and 
-  $\frac{\partial D^2}{\partial s} = 0$
+  To find the minimum distance, we minimize $D$. This means that $\mathbf{w}(s, t)$ must be
+  perpendicular to $\mathbf{u}$ and $\mathbf{v}$ in 3d space (node-segment was referencing
+  2D).
 
-  INCOMPLETE, PROCEDE
-  <!-- TODO: COMPLETE SECTION-->
+  $$ \mathbf{u} \cdot \mathbf{w}(s, t) = 0 \\
+  \mathbf{v} \cdot \mathbf{w}(s, t) = 0$$
+
+  Then we structure it as a more formal system. Let 
+  $\mathbf{w}_0 = \mathbf{P}_1 - \mathbf{P}_2$:
+
+  $$ \mathbf{u} \cdot (\mathbf{w}_0 + s \cdot \mathbf{u} - t \cdot \mathbf{v}) = 0 \Rightarrow s(\mathbf{u} \cdot \mathbf{u}) - (\mathbf{u} \cdot \mathbf{v}) t = -(\mathbf{u} \cdot \mathbf{w}_0)\\
+  \mathbf{v} \cdot (\mathbf{w}_0 + s \cdot \mathbf{u} - t \cdot \mathbf{v}) = 0 \Rightarrow s(\mathbf{v} \cdot \mathbf{u}) - (\mathbf{v} \cdot \mathbf{v}) t = -(\mathbf{v} \cdot \mathbf{w}_0)$$
+  Now let:
+  * $a = \mathbf{u} \cdot \mathbf{u}$
+  * $b = \mathbf{u} \cdot \mathbf{v}$
+  * $c = \mathbf{v} \cdot \mathbf{v}$
+  * $d = \mathbf{u} \cdot \mathbf{w}$
+  * $e = \mathbf{v} \cdot \mathbf{w}$
+
+  $$ a s - bt = -d\\
+  bs - ct = -e$$
+
+  The determinant of the coefficient matrix is 
+  $D = ac - b^2 = (\Vert \mathbf{u} \Vert \Vert \mathbf{v} \Vert \sin \theta)^2$
+
+  If $D = 0 \Rightarrow \sin \theta = 0$, the branches are parallel.
+
+  We can now solve the system. In the general case of $D > 0$:
+
+  $$ s_0 = \frac{be - cd}{ac - b^2}$$
+  If $D \approx 0$, meaning the branches are parallel, there are infinitely many pairs
+  on the infinite line. Here, we fix $s_0 = 0$. 
+
+  To find $t_0$, we have to clamp $s_0$ to a new value 
+  $s' = \text{clamp}_{[0, 1]} (s_0) = \max(0, \min(1, s_0))$. Thus we find that our
+  (temporary) $t_0$ is:
+
+  $$t_0 = \frac{b s' + e}{c}$$
+
+  We now have multiple cases:
+  1. $\mathbf{0 \le t_0 \le 1}$: 
+
+    $$ s = s' \quad t = t_0$$
+
+  2. $\mathbf{t_0 < 0}$:
+
+    Similar to in the node-branch repulsion, this means the closest point on segment $S_2$ is its left endpoint $\mathbf{P}_2$. 
+
+    Thus, $t = 0$. Using $t = 0$ in the systems, we can clamp $s$ again. Thus:
+
+    $$ t = 0 \quad s = \text{clamp}_{[0, 1]} (-\frac{d}{a}) $$
+
+  3. $\mathbf{t_0 > 1}$:
+
+    Now, the closest point on $S_2$ is $\mathbf{Q}_2$. Let $t = 1$. Solving the system gives:
+
+    $$t = 1 \quad s = \text{clamp}_{[0, 1]} (\frac{b-d}{a}) $$
+    
+
+  Finally, we can see the final results are:
+
+  * Closet point on segment $S_1$: $\mathbf{C}_1 = \mathbf{P}_1 + s \cdot \mathbf{u}$
+  *  Closet point on segment $S_2$: $\mathbf{C}_2 = \mathbf{P}_2 + t \cdot \mathbf{v}$
+  *  The shortest distance $d = \Vert \mathbf{C}_1 - \mathbf{C}_2 \Vert$
+
 
 * **Calculation** 
   1. The minimum distance is $d_\text{min} = 2 R_c$
@@ -425,6 +486,5 @@ This is more complex and contains a higher density of nodes than the baseline.*
 ![Stress Test](./images/networks/chaos.png)
 *Figure 6: A complex stress test for a clustered and compact network. Apparent intersections within this 2D image are projection 
 artifacts. All components are physically separated in 3D space.*
-
 
 
