@@ -11,12 +11,12 @@ from ..modules.utils import (
 # CONSTANTS
 RADIUS_MEAN = 5.0
 RADIUS_STD = 0.5
-NODE_AMOUNT = 8
-BOX_LENGTH = 200
-BRANCH_LENGTH_MEAN = 70.0
-BRANCH_LENGTH_STD = 5.0
-AMOUNT_PER_NODE = 2
-CYLINDER_RADIUS = 2.0
+NODE_AMOUNT = 15
+BOX_LENGTH = 100
+BRANCH_LENGTH_MEAN = 18.0
+BRANCH_LENGTH_STD = 3.0
+AMOUNT_PER_NODE = 4
+CYLINDER_RADIUS = 1.7
 DENSITY = 0.4
 
 radius_deviation_log = np.sqrt(np.log(1 + (RADIUS_STD / RADIUS_MEAN) ** 2))
@@ -63,9 +63,9 @@ final_node_positions = relax_network_positions(
     branch_to_length=branch_to_length,
     node_radii=radii,
     cylinder_radius=CYLINDER_RADIUS,
-    iterations=20000,
-    learning_rate=0.02,
-    repulsion_strength=7.0,
+    iterations=80000,
+    learning_rate=0.005,
+    repulsion_strength=7.7,
 )
 
 points_nodes: list = []

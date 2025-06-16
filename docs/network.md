@@ -396,6 +396,35 @@ the shortest distance between their line segments is greater than $2 R_c$
   stage. The force on branch $e_l$ is $-\frac{F_\text{repel}}{2}$ which is distributed to $v_a$ and $v_b$ similar to before witht he $t$ parametric position.
 
 
+## Examples
+
+**Note on 2D projections:** Each figure is attempting to capture a 2D image of a 3D object. Thus, nodes and branches that are separate in 3D space may appear
+to overlap. For example, a branch in the foreground can be seen to intersect a branch in the background. The examples are provided 
+at a slight angle to mitigate this, but intersections may still be seen. It is recommended to test out the `*.dump` files (after 
+running the program) in OVITO for an accurate representation.
+
+**Note on connections:** All nodes will have at most $M$ branches connected to it. Due to the variability of configuration, specifically
+$M$ and $N$, it is impossible to guarantee that each node has $M$ connections. 
+
+![Baseline](./images/networks/baseline.png)
+*Figure 1: A baseline network with $N=8$ nodes and maximum degree of M=3. Note the triangular and open structure.*
+
+![More Nodes](./images/networks/more_nodes.png)
+*Figure 2: Effect of increasing node count to $N=14$ from $N=8$, and compensating this with an increase of the mean branch length to $\mu_l = 50.0$.
+This is more complex and contains a higher density of nodes than the baseline.*
+
+![Shorter Branches](./images/networks/smaller_branch.png)
+*Figure 3: Effect of decreasing mean branch length to $\mu_l = 20.0$. Structure is more clustered and confined, with no overlaps.*
+
+![More Connections](./images/networks/more_connections.png)
+*Figure 4: We increase the number of connections to $M=4$. This creates a more complex and interconnected structure.*
+
+![More Radius Variation](./images/networks/more_std_dev.png)
+*Figure 5: An increase of the standard deviation of the radius to $\sigma_r = 2.0$ vastly varies the size of the nodes.*
+
+![Stress Test](./images/networks/chaos.png)
+*Figure 6: A complex stress test for a clustered and compact network. Apparent intersections within this 2D image are projection 
+artifacts. All components are physically separated in 3D space.*
 
 
 

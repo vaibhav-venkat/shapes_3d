@@ -58,7 +58,7 @@ def relax_network_positions(
         for n1 in range(num_nodes):
             for n2 in range(n1 + 1, num_nodes):
                 # some breathing room
-                min_dist = node_radii[n1] + node_radii[n2] + 0.1
+                min_dist = node_radii[n1] + node_radii[n2] + 0.2
                 vec = positions[n2] - positions[n1]
                 dist = np.linalg.norm(vec)
                 if dist < 1e-6:
@@ -82,7 +82,7 @@ def relax_network_positions(
                 dist, closest_pt = point_segment_distance(
                     positions[node_k], positions[branch_i], positions[branch_j]
                 )
-                min_allowed = node_radii[node_k] + cylinder_radius + 0.1
+                min_allowed = node_radii[node_k] + cylinder_radius + 0.2
                 if dist < min_allowed:
                     overlap = min_allowed - dist
                     direction = (
@@ -105,7 +105,7 @@ def relax_network_positions(
                     forces[branch_j] -= force_on_node * t
 
         # Branch-Branch
-        min_branch_dist = 2 * cylinder_radius
+        min_branch_dist = 2 * cylinder_radius + 0.2
         for b1_idx in range(num_branches):
             for b2_idx in range(b1_idx + 1, num_branches):
                 n1, n2 = branches[b1_idx]
