@@ -1,7 +1,7 @@
-# A "network""-like structure
+# A "network"-like structure
 
-The structure consists of a system of spheres (nodes) which are
-attached to each other via cylinders (branches).
+The structure consists of a system of spheres (**nodes**) which are
+attached to each other via cylinders (**branches**).
 
 ## 0. Model definition
 
@@ -14,8 +14,11 @@ attached to each other via cylinders (branches).
 5. $\mu_{l}$: Mean branch length
 6. $\sigma_{l}$: The standard deviation of the length of each branch
 7. $M$: Number of branches per node
-8. $R_c$ is the radius of each branch/cylinder
+8. $R_c$ is the radius of each branch
 9. $\rho$ is the density of the scatters in points per unit volume
+
+**Note:** $\rho$ is only used for generating the sphere and cylinder structures. 
+It is not used throughout this page. 
 
 ## 1. The components of the system
 
@@ -23,14 +26,14 @@ The core system is extremely similar to the graph data structure.
 
 ### Component 1: Nodes
 
-The vertices of the graph, a.k.a the core components. Let this set of vertices be
+Nodes are the **vertices** of the graph, a.k.a the core components. Let this set of vertices be
 $\mathbf{V} = (v_0, v_1, \dots, v_{N-1})$. Each vertex is a sphere in $\mathbb{R}^3$ with
 center $p_i = (x_i, y_i, z_i)$ and radius $r_i$, whose creation will
 be discussed further down.
 
 ### Component 2: Branches
 
-These are the edges of the graph, $\mathbf{E}$, with each edge $e_k = (v_i, v_j)$
+These are the **edges** of the graph, $\mathbf{E}$, with each edge $e_k = (v_i, v_j)$
 connects two nodes. Branch $k$ has a desired length of $l_k$. Let there be $B$ branches
 total, which is derived from $N$ and $M$.
 
@@ -45,13 +48,14 @@ information on this, see previous pages ("distribution of x").
 * $I$: The number of iterations of the simulation.
 * $S_\text{repel}$: The repulsion strength multiplier of each node.
 * $k_{lr}$: The "learning rate" of the simulation. If its lower, its more precise
-but requires more iterations.
+but requires more iterations. Its a simple scalar which can modify the intensity of 
+forces and energies.
 
 ## 2. The Goal
 
 The goal is to form a system of nodes and branches that do not overlap and have desired
 length and key features. Thus, we seek to minimize an energy function $U_{\text{sys}}$,
-aiming for an equilibrium state.
+aiming for an **equilibrium state**.
 
 $$ U_\text{sys} = U_\text{spring} + U_\text{repel} $$
 
@@ -210,7 +214,7 @@ where $v_i \le v_j$
 
 ## 4. The Iterative Method
 
-Now we start the simulation (the good part).
+Now we start the simulation.
 
 The first node is initially centered at $p_0 = (0, 0, 0)$ for consistency.
 For the remaining $N-1$ nodes, their initial positions are generated in
@@ -244,7 +248,7 @@ First, we calculate the vector $\mathbf{u} = \mathbf{p}_j - \mathbf{p}_i$, with
 $d = \Vert \mathbf{u} \Vert$
 If $d$ is numerically very close to $0$, $d < 10^{-6}$, then
 we set $d = 10^{-6}$ and randomize the direction of $\mathbf{u}$ such that
-its magnitude is $10^{-6}$.
+its magnitude is $10^{-6}$. We do this to avoid division by zero numerical errors.
 
 Thus, the force exerted along the branch will be
 
@@ -317,7 +321,6 @@ This repulsion accounts for nodes intersecting with other branches.
 * **The Goal**: For any node $v_k$ and branch $e_m = (v_i, v_j)$ where 
 $k \ne i$ and $k \ne j$, the shortest distance between $p_k$ and
 the line segment representing $e_m$ is greater than $r_k + R_c$
-must satisfy $d < r_i + R_c$.
 * **Implementation**: We need to find the closet point $\mathbf{C}$ on the line segment
 $p_i p_j$ to the point $p_k$. There are three cases.
   1. $\mathbf{C}$ lies between $p_i$ and $p_j$\
@@ -367,7 +370,7 @@ and $\mathbf{B}$. This will be used in the calculation.
 the shortest distance between their line segments is greater than $2 R_c$
 
 * **Method**: We must find the shortest distance between two line segments, $S_1$
-  from $\mathbf{P}_1$ to $\mathbf{Q}_1$, and $S_2$ from $\mathbf{P}_2$ to $\mathbf{Q}_1$.
+  from $\mathbf{P}_1$ to $\mathbf{Q}_1$, and $S_2$ from $\mathbf{P}_2$ to $\mathbf{Q}_2$.
   
   First, lets define the segments parametrically.
 
@@ -408,7 +411,7 @@ the shortest distance between their line segments is greater than $2 R_c$
 
   $$ s_0 = \frac{be - cd}{ac - b^2}$$
   If $D \approx 0$, meaning the branches are parallel, there are infinitely many pairs
-  on the infinite line. Here, we fix $s_0 = 0$. 
+  on the infinite line. Here, we arbitrarily fix $s_0 = 0$, to avoid the infinite pairs. 
 
   To find $t_0$, we have to clamp $s_0$ to a new value 
   $s' = \text{clamp}_{[0, 1]} (s_0) = \max(0, \min(1, s_0))$. Thus we find that our
