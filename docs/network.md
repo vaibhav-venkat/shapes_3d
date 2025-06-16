@@ -3,7 +3,7 @@
 The structure consists of a system of spheres (nodes) which are
 attached to each other via cylinders (branches).
 
-## [0] Model definition
+## 0. Model definition
 
 ### Structural features
 
@@ -310,24 +310,92 @@ $\mathbf{p}_i$ and $\mathbf{p}_j$ is greater than the sum of their radii, $r_i +
         * Force on $v_i$: $\mathbf{F}_i = -\mathbf{F}_\text{repel} / 2$
         * Force on $v_j$: $\mathbf{F}_j = +\mathbf{F}_\text{repel} / 2$
 
-* **Code:**
-
-    ```python
-    min_dist = radii[node1] + radii[node2]
-    vec = positions[node2] - positions[node1]
-    dist = np.linalg.norm(vec)
-
-    if dist < min_dist:
-        overlap = min_dist - dist
-        direction = vec / dist
-        # Calculate total repulsion force vector
-        repulsion_force = learning_rate * repulsion_strength * overlap * direction
-        
-        # Apply half the force to each node
-        forces[node1] -= repulsion_force / 2.0
-        forces[node2] += repulsion_force / 2.0
-    ```
-
----
-
 #### Stage 2: Node-Branch Repulsion ($F_{nb}$)
+
+This repulsion accounts for nodes intersecting with other branches.
+
+* **The Goal**: For any node $v_k$ and branch $e_m = (v_i, v_j)$ where 
+$k \ne i$ and $k \ne j$, the shortest distance between $p_k$ and
+the line segment representing $e_m$ is greater than $r_k + R_c$
+must satisfy $d < r_i + R_c$.
+* **Implementation**: We need to find the closet point $\mathbf{C}$ on the line segment
+$p_i p_j$ to the point $p_k$. There are three cases.
+  1. $\mathbf{C}$ lies between $p_i$ and $p_j$\
+    <img alt="Center demonstration" src="./images/three_cases_geometric_network/middle.png" width="250" />
+  2. $\mathbf{C}$ is the left endpoint\
+    <img alt="Left demonstration" src="./images/three_cases_geometric_network/left.png" width="250" />
+
+  3. $\mathbf{C}$ is the right endpoint\
+    <img alt="Right demonstration" src="./images/three_cases_geometric_network/right.png" width="251" />
+
+* **Method**: We need to use a vector projection. We determine where a perpendicular 
+projection of $\mathbf{P}$ lands relative to the segment connecting $\mathbf{A}$
+and $\mathbf{B}$. This will be used in the calculation.
+
+  First, we define vectors $\mathbf{u} = \mathbf{A} - \mathbf{B}$ (the segement's vector) and $\mathbf{v} = \mathbf{P} - \mathbf{A}$.
+
+  Next, we must calculate the scalar projection parameter $t$
+
+    $$ t = \frac{\mathbf{v} \cdot \mathbf{u}}{\mathbf{u} \cdot \mathbf{u}}  =
+    \frac{(\mathbf{P} - \mathbf{A}) \cdot (\mathbf{B} - \mathbf{A})}{\Vert \mathbf{B} - \mathbf{A} \Vert ^2} $$
+  Using the definition of a dot product and geometry, this reduces to 
+  $t = \frac{\Vert AC \Vert}{\Vert u \Vert}$. 
+
+  If $t \le 0$, $\mathbf{C} = \mathbf{A}$. 
+  If $t \ge 1$, $\mathbf{C} = \mathbf{B}$. If $0 < t < 1$, 
+    $\mathbf{C} = \mathbf{A} + t \cdot \mathbf{u}$. 
+
+  The final distance is $d = \Vert \mathbf{P} - \mathbf{C} \Vert$
+* **Calculation**
+  1. The minimum allowed distance $d_\text{min} = r_k + R_c$
+  2. For node $v_k$ and branch $e_m = (v_i, v_j)$ use the method above 
+  with $\mathbf{P} = p_k$, $\mathbf{A} = p_i$, $\mathbf{B} = p_j$ to find 
+  the distance $d$ and the closet point $C$.
+  3. If $d < d_\text{min}$ then let the overlap region be $\delta = d_\text{min} - d$.
+  4. The repulsion force acts along the direction from $\mathbf{C}$ to $p_k$.
+
+  $$ \mathbf{F}_\text{repel} = k_\text{lr} S_\text{repel} \delta \frac{p_k - \mathbf{C}}{\Vert p_k - \mathbf{C} \Vert} $$
+  5. This force is distributed to three nodes.
+
+  $$F_k = + \mathbf{F}_\text{repel} \\
+    F_i = -(1 - t) \mathbf{F}_\text{repel} \\
+    F_j = -t\mathbf{F}_\text{repel}$$
+
+#### Stage 3: Branch-Branch Repulsion
+
+* **The Goal**:  For any two line segments $e_k = (v_i, v_j)$ and $e_l = (v_a, v_b)$,
+the shortest distance between their line segments is greater than $2 R_c$
+
+* **Method**: We must find the shortest distance between two line segments, $S_1$
+  from $\mathbf{P}_1$ to $\mathbf{Q}_1$, and $S_2$ from $\mathbf{P}_2$ to $\mathbf{Q}_1$.
+  
+  First, lets define the segments parametrically.
+
+  $$ L_1 (s) = \mathbf{P}_1 + s \cdot \mathbf{u}, \quad \mathbf{u} = \mathbf{Q}_1 - \mathbf{P}_1 \\
+     L_2(t) = \mathbf{P}_2 + t \cdot \mathbf{v}, \quad \mathbf{v} = \mathbf{Q}_2 - \mathbf{P}_2$$
+
+  The squared distance between any two points on the line is $D(s, t)^2 = \Vert L_1(s) - L_2 (t) \Vert ^2$.
+
+  To find the minimum distance, we solve the system of equations: $\frac{\partial D^2}{\partial t} = 0$ and 
+  $\frac{\partial D^2}{\partial s} = 0$
+
+  INCOMPLETE, PROCEDE
+  <!-- TODO: COMPLETE SECTION-->
+
+* **Calculation** 
+  1. The minimum distance is $d_\text{min} = 2 R_c$
+  2. For two non-adjacent (doesn't connect to the same node) branches $e_k = (v_i, v_j)$ and
+  $e_l = (v_a, v_b)$, use the method above to find the shortest distance $d$ and the points at
+  which it occurs $\mathbf{C}_k$ on $e_k$, $\mathbf{C}_l$ on $e_l$. 
+  3. If $d < d_\text{min}$, then define $\delta = d_\text{min} - d$. 
+  4. The repulsion force acts upon the line which represents the distance, thus:
+  
+  $$ F_\text{repel} = k_{lr} S_\text{repel} \delta \cdot \frac{\mathbf{C}_k - \mathbf{C}_l}{\Vert \mathbf{C}_k - \mathbf{C}_l \Vert} $$
+  5. We now distribute the forces.
+  The force on branch $e_k$ is $+\frac{F_\text{repel}}{2}$. This is distributed to $v_i$ and $v_j$ based on $s$ similar to the Node-Branch
+  stage. The force on branch $e_l$ is $-\frac{F_\text{repel}}{2}$ which is distributed to $v_a$ and $v_b$ similar to before witht he $t$ parametric position.
+
+
+
+
+
