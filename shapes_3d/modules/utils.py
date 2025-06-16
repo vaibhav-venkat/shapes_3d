@@ -195,9 +195,9 @@ def segment_segment_distance(
     v = q2 - p2
     w = p1 - p2
 
-    a = np.dot(u, u)  # always >= 0
+    a = np.dot(u, u)  # >= 0
     b = np.dot(u, v)
-    c = np.dot(v, v)  # always >= 0
+    c = np.dot(v, v)  # >= 0
     d = np.dot(u, w)
     e = np.dot(v, w)
 
@@ -208,7 +208,6 @@ def segment_segment_distance(
     else:
         s_c = b * e - c * d
 
-    # Clamp parameters to the [0, 1] range for segments
     s = np.clip(s_c / D, 0.0, 1.0) if D > 1e-7 else 0.0
 
     # Recalculate t for the clamped s
