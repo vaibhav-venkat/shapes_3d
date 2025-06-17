@@ -19,13 +19,15 @@ The official shapes documentation is at the [Crease Shapes ReadTheDocs](https://
 conda activate my_project_env
 ```
 
-## Running the project
+## Creating structures
 
-To run any filename, use:
+To create the structure of any filename, use:
 
 ```bash
-python -m src.objects.filename
+python -m shapes_3d.objects.filename
 ```
+The output should indicate where the `*.dump` file is located. 
+
 
 ## Visualizing *.dump files
 

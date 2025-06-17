@@ -9,15 +9,19 @@ from ..modules.utils import (
 )
 
 # CONSTANTS
-RADIUS_MEAN = 5.0
+# NOTE: CHANGE THESE!!
+RADIUS_MEAN = 4.0
 RADIUS_STD = 0.5
-NODE_AMOUNT = 15
+NODE_AMOUNT = 6
 BOX_LENGTH = 100
-BRANCH_LENGTH_MEAN = 18.0
+BRANCH_LENGTH_MEAN = 45.0
 BRANCH_LENGTH_STD = 3.0
-AMOUNT_PER_NODE = 4
+AMOUNT_PER_NODE = 3
 CYLINDER_RADIUS = 1.7
 DENSITY = 0.4
+ITERATIONS = 80000
+LEARNING_RATE = 0.01
+REPULSION_STRENGTH = 7.6
 
 radius_deviation_log = np.sqrt(np.log(1 + (RADIUS_STD / RADIUS_MEAN) ** 2))
 radius_mean_log = np.log(RADIUS_MEAN) - radius_deviation_log**2 / 2
@@ -63,9 +67,9 @@ final_node_positions = relax_network_positions(
     branch_to_length=branch_to_length,
     node_radii=radii,
     cylinder_radius=CYLINDER_RADIUS,
-    iterations=80000,
-    learning_rate=0.005,
-    repulsion_strength=7.7,
+    iterations=ITERATIONS,
+    learning_rate=LEARNING_RATE,
+    repulsion_strength=REPULSION_STRENGTH,
 )
 
 points_nodes: list = []
@@ -76,7 +80,6 @@ for i in range(NODE_AMOUNT):
 
 points_branches: list = []
 for i, (node1, node2) in enumerate(branches):
-
     pos1 = final_node_positions[node1]
     pos2 = final_node_positions[node2]
 
