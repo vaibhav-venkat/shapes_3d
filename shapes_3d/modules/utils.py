@@ -16,14 +16,6 @@ def relax_network_positions(
     repulsion_strength: float = 2.5,
     force_stop_threshold: float = 1e-5,
 ) -> np.ndarray:
-    """
-    Adjusts node positions with full collision avoidance:
-    1. Node-Node
-    2. Node-Branch
-    3. Branch-Branch
-
-    """
-
     positions = np.copy(initial_positions)
     num_nodes = len(positions)
 
@@ -49,7 +41,7 @@ def relax_network_positions(
             error = dist - target_length
             direction = vec / dist
             # total force should be double this, but we apply it to both
-            # F = kx, k = learning_rate and dx = error
+            # F = k dx, k = learning_rate and dx = error
             force_vec = learning_rate * error * direction / 2.0
             forces[node1] += force_vec
             forces[node2] -= force_vec
@@ -163,11 +155,11 @@ def relax_network_positions(
         # Check for convergence
         max_movement = np.max(np.linalg.norm(forces, axis=1))
         if max_movement < force_stop_threshold:
-            print(f"\nConvergence reached at iteration {i+1}.")
+            print(f"\nConvergence reached at iteration {i + 1}.")
             break
         if (i + 1) % 20 == 0:
             print(
-                f"\rIteration {i+1}/{iterations}, Max Movement: {max_movement:.6f}",
+                f"\rIteration {i + 1}/{iterations}, Max Movement: {max_movement:.6f}",
                 end="",
             )
 
@@ -389,7 +381,7 @@ def save_dump(points, filename: str, box_len: float):
         f.write("ITEM: TIMESTEP\n0\n")
         f.write(f"ITEM: NUMBER OF ATOMS\n{num}\n")
         f.write(
-            f"ITEM: BOX BOUNDS pp pp pp\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n{-box_len//2} {box_len//2}\n"
+            f"ITEM: BOX BOUNDS pp pp pp\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n{-box_len // 2} {box_len // 2}\n"
         )
         f.write("ITEM: ATOMS id type x y z\n")
         max_type: int = 0
