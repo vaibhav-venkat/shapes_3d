@@ -9,7 +9,7 @@ from ..modules.utils import (
 )
 
 # CONSTANTS
-# NOTE: CHANGE THESE!!
+# NOTE: CHANGE CONSTANTS
 RADIUS_MEAN = 4.0
 RADIUS_STD = 0.5
 NODE_AMOUNT = 6
@@ -19,9 +19,11 @@ BRANCH_LENGTH_STD = 3.0
 AMOUNT_PER_NODE = 3
 CYLINDER_RADIUS = 1.7
 DENSITY = 0.4
-ITERATIONS = 80000
-LEARNING_RATE = 0.01
-REPULSION_STRENGTH = 7.6
+ITERATIONS = (
+    80000  # As high as you can tolerate. It will terminate if it converges before.
+)
+LEARNING_RATE = 0.01  # 0.005 for more precision
+REPULSION_STRENGTH = 7.6  # 5.0 < REPULSION_STRENGTH < 10.0
 
 radius_deviation_log = np.sqrt(np.log(1 + (RADIUS_STD / RADIUS_MEAN) ** 2))
 radius_mean_log = np.log(RADIUS_MEAN) - radius_deviation_log**2 / 2
@@ -85,15 +87,17 @@ for i, (node1, node2) in enumerate(branches):
 
     vec_diff = pos2 - pos1
     dist = np.linalg.norm(vec_diff)
+    diff_y = vec_diff[1]
+    diff_x = vec_diff[0]
+    diff_z = vec_diff[2]
 
     if dist < 1e-6:
         continue
 
     center_pos = (pos1 + pos2) / 2.0
 
-    # tan(azi) = y/x
-    azimuthal = np.arctan2(vec_diff[1], vec_diff[0])
-    polar = np.arccos(vec_diff[2] / dist)
+    azimuthal = np.arctan2(diff_y, diff_x)
+    polar = np.arccos(diff_z / dist)
 
     branch = Cylinder(DENSITY, float(dist), CYLINDER_RADIUS, polar, azimuthal)
     branch_points = branch.make_obj() + center_pos
