@@ -4,20 +4,18 @@ from shapes_3d.modules.cylinder import Cylinder
 from shapes_3d.modules.ellipsoid import Ellipsoid
 from ..modules.utils import (
     create_network_graph,
+    relax_network_positions_alt,
     save_dump,
-    relax_network_positions,
 )
 
 # CONSTANTS
 # NOTE: CHANGE CONSTANTS
-RADIUS_MEAN = 4.0
+RADIUS_MEAN = 5.0
 RADIUS_STD = 0.5
-NODE_AMOUNT = 7
-BOX_LENGTH = 150
-BRANCH_LENGTH_MEAN = 50.0
-BRANCH_LENGTH_STD = 3.0
-AMOUNT_PER_NODE = 2
-CYLINDER_RADIUS = 2
+NODE_AMOUNT = 10
+BOX_LENGTH = 200
+AMOUNT_PER_NODE = 3
+CYLINDER_RADIUS = 3
 DENSITY = 0.4
 ITERATIONS = (
     290000  # As high as you can tolerate. It will terminate if it converges before.
@@ -28,10 +26,6 @@ REPULSION_STRENGTH = 7.6  # 5.0 < REPULSION_STRENGTH < 10.0
 radius_deviation_log = np.sqrt(np.log(1 + (RADIUS_STD / RADIUS_MEAN) ** 2))
 radius_mean_log = np.log(RADIUS_MEAN) - radius_deviation_log**2 / 2
 
-branch_length_deviation_log = np.sqrt(
-    np.log(1 + (BRANCH_LENGTH_STD / BRANCH_LENGTH_MEAN) ** 2)
-)
-branch_length_mean_log = np.log(BRANCH_LENGTH_MEAN) - branch_length_deviation_log**2 / 2
 
 radii: np.ndarray = np.random.lognormal(
     radius_mean_log, radius_deviation_log, NODE_AMOUNT
@@ -52,21 +46,18 @@ for node1 in range(NODE_AMOUNT):
             visited_edges.add(edge)
 
 BRANCH_AMOUNT = len(branches)
-target_lengths: np.ndarray = np.random.lognormal(
-    branch_length_mean_log, branch_length_deviation_log, BRANCH_AMOUNT
-)
-branch_to_length = {branches[k]: target_lengths[k] for k in range(BRANCH_AMOUNT)}
 
 # close to the origin
-initial_node_centers = np.random.uniform(-20, 20, (NODE_AMOUNT, 3))
+initial_node_centers = np.random.uniform(
+    -BOX_LENGTH / 2, BOX_LENGTH / 2, (NODE_AMOUNT, 3)
+)
 
-# node 0 (first node) always starts at origin for consistency
-initial_node_centers[0] = np.array([0.0, 0.0, 0.0])
 
-final_node_positions = relax_network_positions(
+final_node_positions = relax_network_positions_alt(
     initial_positions=initial_node_centers,
     graph=graph,
-    branch_to_length=branch_to_length,
+    box_length=BOX_LENGTH,
+    branches=branches,
     node_radii=radii,
     cylinder_radius=CYLINDER_RADIUS,
     iterations=ITERATIONS,
@@ -105,5 +96,10 @@ for i, (node1, node2) in enumerate(branches):
 points_arr: np.ndarray = np.array(points_nodes)
 points_cylinder_arr: np.ndarray = np.array(points_branches)
 save_dump([points_arr, points_cylinder_arr], "out/network.dump", BOX_LENGTH)
-
+branch_lengths = np.zeros(len(branches))
+for i in range(len(branches)):
+    branch_lengths[i] = np.linalg.norm(
+        final_node_positions[branches[i][0]] - final_node_positions[branches[i][1]]
+    )
+print("Branch lengths: ", branch_lengths)
 print("Done.")

@@ -5,6 +5,164 @@ import sys
 import collections
 
 
+def relax_network_positions_alt(
+    initial_positions: np.ndarray,
+    graph: dict,
+    branches: list[tuple[int, int]],
+    node_radii: np.ndarray,
+    cylinder_radius: float,
+    box_length: float,
+    iterations: int = 2000,
+    learning_rate: float = 0.05,
+    repulsion_strength: float = 2.5,
+    force_stop_threshold: float = 1e-6,
+) -> np.ndarray:
+    positions = np.copy(initial_positions)
+    num_nodes = len(positions)
+
+    num_branches = len(branches)
+
+    print("Relaxing network layout with collision mitigation")
+    for i in range(iterations):
+        forces = np.zeros_like(positions)
+        # Node-Wall repulsion
+        for n in range(num_nodes):
+            displacement = np.zeros(3)
+            position = positions[n]
+            for i in range(3):
+                coord = position[i]
+                if coord > box_length / 2 - 1:
+                    displacement[i] = coord - box_length / 2 + 1
+                elif coord < -box_length / 2 + 1:
+                    displacement[i] = box_length / 2 - 1 + coord
+            dist = np.linalg.norm(displacement)
+            if dist < 1e-6:
+                dist = 1e-6
+                displacement = np.random.rand(3) * 1e-6
+            direction = displacement / dist
+            repulsion = learning_rate * repulsion_strength * displacement * direction
+            forces[n] -= repulsion
+        # Node-Node Repulsion
+        for n1 in range(num_nodes):
+            for n2 in range(n1 + 1, num_nodes):
+                # some breathing room
+                min_dist = node_radii[n1] + node_radii[n2] + 0.1
+                vec = positions[n2] - positions[n1]
+                dist = np.linalg.norm(vec)
+                if dist < 1e-6:
+                    dist = 1e-6
+                    vec = np.random.rand(3) * 1e-6
+                if dist < min_dist:
+                    overlap = min_dist - dist
+                    direction = vec / dist
+                    repulsion = (
+                        learning_rate * repulsion_strength * overlap * direction / 2.0
+                    )
+                    forces[n1] -= repulsion
+                    forces[n2] += repulsion
+
+        # Node-Branch Repulsion
+        for node_k in range(num_nodes):
+            for branch_i, branch_j in branches:
+                # don't repel if it is the node's own branch
+                if node_k == branch_i or node_k == branch_j:
+                    continue
+                dist, closest_pt = point_segment_distance(
+                    positions[node_k], positions[branch_i], positions[branch_j]
+                )
+                min_allowed = node_radii[node_k] + cylinder_radius + 0.1
+                if dist < min_allowed:
+                    overlap = min_allowed - dist
+                    direction = (
+                        (positions[node_k] - closest_pt) / dist
+                        if dist > 1e-6
+                        else np.random.rand(3)
+                    )
+                    force_on_node = (
+                        learning_rate * repulsion_strength * overlap * direction
+                    )
+                    forces[node_k] += force_on_node
+                    vec_branch = positions[branch_j] - positions[branch_i]
+                    len_sq = np.dot(vec_branch, vec_branch)
+                    t = (
+                        np.dot(closest_pt - positions[branch_i], vec_branch) / len_sq
+                        if len_sq > 1e-12
+                        else 0.5
+                    )
+                    forces[branch_i] -= force_on_node * (1.0 - t)
+                    forces[branch_j] -= force_on_node * t
+
+        # Branch-Branch
+        min_branch_dist = 2 * cylinder_radius + 0.1
+        for b1_idx in range(num_branches):
+            for b2_idx in range(b1_idx + 1, num_branches):
+                n1, n2 = branches[b1_idx]
+                n3, n4 = branches[b2_idx]
+
+                # Skip if branches share a node
+                if n1 in (n3, n4) or n2 in (n3, n4):
+                    continue
+
+                dist, closest_p1, closest_p2 = segment_segment_distance(
+                    positions[n1], positions[n2], positions[n3], positions[n4]
+                )
+
+                if dist < min_branch_dist:
+                    overlap = min_branch_dist - dist
+                    if dist < 1e-6:
+                        dist = 1e-6
+                        direction = np.random.rand(3)
+                    else:
+                        direction = (closest_p1 - closest_p2) / dist
+
+                    total_force = (
+                        learning_rate * repulsion_strength * overlap * direction
+                    )
+
+                    # Distribute this force to the 4 nodes
+                    # branch 1
+                    force_b1 = total_force / 2.0
+                    vec_b1 = positions[n2] - positions[n1]
+                    len_sq_b1 = np.dot(vec_b1, vec_b1)
+                    s = (
+                        np.dot(closest_p1 - positions[n1], vec_b1) / len_sq_b1
+                        if len_sq_b1 > 1e-12
+                        else 0.5
+                    )
+                    forces[n1] += force_b1 * (1.0 - s)
+                    forces[n2] += force_b1 * s
+
+                    # Force on branch 2
+                    force_b2 = -total_force / 2.0
+                    vec_b2 = positions[n4] - positions[n3]
+                    len_sq_b2 = np.dot(vec_b2, vec_b2)
+                    t = (
+                        np.dot(closest_p2 - positions[n3], vec_b2) / len_sq_b2
+                        if len_sq_b2 > 1e-12
+                        else 0.5
+                    )
+                    forces[n3] += force_b2 * (1.0 - t)
+                    forces[n4] += force_b2 * t
+
+        # Anchor the first node and update positions
+        forces[0] = 0.0
+        positions += forces
+
+        # Check for convergence
+        max_movement = np.max(np.linalg.norm(forces, axis=1))
+        if max_movement < force_stop_threshold:
+            print(f"\nConvergence reached at iteration {i + 1}.")
+            break
+        if (i + 1) % 20 == 0:
+            print(
+                f"\rIteration {i + 1}/{iterations}, Max Movement: {max_movement:.6f}",
+                end="",
+            )
+
+    print("\nRelaxation complete.")
+    return positions
+
+
 def relax_network_positions(
     initial_positions: np.ndarray,
     graph: dict,
