@@ -31,10 +31,10 @@ def relax_network_positions_alt(
             position = positions[n]
             for i in range(3):
                 coord = position[i]
-                if coord > box_length / 2 - 1:
-                    displacement[i] = coord - box_length / 2 + 1
-                elif coord < -box_length / 2 + 1:
-                    displacement[i] = box_length / 2 - 1 + coord
+                if coord > box_length / 2 - node_radii[i]:
+                    displacement[i] = coord - box_length / 2 + node_radii[i]
+                elif coord < -box_length / 2 + node_radii[i]:
+                    displacement[i] = box_length / 2 + coord - node_radii[i]
             dist = np.linalg.norm(displacement)
             if dist < 1e-6:
                 dist = 1e-6
@@ -341,10 +341,14 @@ def segment_segment_distance(
             - The closest point on the first segment.
             - The closest point on the second segment.
     """
+    epsilon = 1e-12
     u = q1 - p1
     v = q2 - p2
     w = p1 - p2
-
+    max_val = 1e5
+    u = np.clip(u, -max_val, max_val)
+    v = np.clip(v, -max_val, max_val)
+    w = np.clip(w, -max_val, max_val)
     a = np.dot(u, u)  # >= 0
     b = np.dot(u, v)
     c = np.dot(v, v)  # >= 0
@@ -385,6 +389,11 @@ def segment_segment_distance(
 
     closest_point1 = p1 + s * u
     closest_point2 = p2 + t * v
+    # Final check for NaN on the output before calculating distance
+    if np.isnan(closest_point1).any() or np.isnan(closest_point2).any():
+        # If something still went wrong, return a default safe value
+        return float(np.linalg.norm(p1 - p2)), p1, p2
+
     distance = np.linalg.norm(closest_point1 - closest_point2)
 
     return float(distance), closest_point1, closest_point2
@@ -416,8 +425,8 @@ def point_segment_distance(
     # If the segment is just a point (a and b are the same)
     if len_sq_ab < 1e-12:
         return float(np.linalg.norm(ap)), a
-
-    t = np.dot(ap, ab) / len_sq_ab
+    epsilon = 1e-12
+    t = np.dot(ap, ab) / (len_sq_ab + epsilon)
 
     if t < 0.0:  # behind point a
         closest_point = a
