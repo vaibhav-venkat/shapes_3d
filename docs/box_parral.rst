@@ -58,3 +58,7 @@ The minimum distance between any two centers must be :
 
 
 Finally, at each center we generate a :ref:`parallelepiped <parral>`.
+
+Code
+-------
+`Generate a cube with parallelepipeds <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/box_parra.py>`_

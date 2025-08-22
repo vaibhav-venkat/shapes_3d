@@ -50,4 +50,6 @@ For each onion :math:`O`, we use the steps outlined in the :ref:`patchy onions <
 with the same structural features. The randomization in step 3 combined with the different distributions ensures
 that all onions look different.
 
-
+Code
+---------
+`Generate a cube with patchy onions <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/patchy_onion.py>`_

@@ -47,4 +47,6 @@ Example
 These images demonstrate how certain onions will look like based on their shell count. 
 The cross section showcases their densities, which is similar to that of the :ref:`sphere <uni-sphere>`
 
-
+Code
+--------
+`Generate an onion <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/onion.py>`_

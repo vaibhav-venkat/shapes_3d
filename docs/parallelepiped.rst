@@ -104,3 +104,7 @@ Example
 This image demonstrates how parallelepiped objects respond to the slant angle, with cross sections 
 being used. The image on the right is more slanted than the left, despite :math:`\varphi_\text{left} = \theta_\text{right}`,
 because of the larger :math:`x` length. The density and lengths are constant throughout the example.
+
+Code
+-------
+`Generate the parallelepiped shells <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/parallelepiped.py>`_

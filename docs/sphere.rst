@@ -51,3 +51,7 @@ The left image contains densely clustered scatters due to its high density,
 while the right image contains spread out scatters due to its lower density.
 
 This structure is generated using :ref:`the Ellipsoid class <ellipsoid-class>`, with :math:`a = c`
+
+Code
+----------
+`Generate a sphere <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/sphere.py>`_

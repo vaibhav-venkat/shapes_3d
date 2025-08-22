@@ -490,4 +490,7 @@ This is more complex and contains a higher density of nodes than the baseline.*
 *Figure 6: A complex stress test for a clustered and compact network. Apparent intersections within this 2D image are projection 
 artifacts. All components are physically separated in 3D space.*
 
+## Code
 
+- [Generate a network structure](https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/network.py)
+- [Generate an alternative network structure, defined by the bound size](https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/network_alternative.py)

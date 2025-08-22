@@ -39,3 +39,6 @@ The left image is very dense, due to a high :math:`\rho`, while the right image 
 
 This structure is generated using :ref:`the Ellipsoid class <ellipsoid-class>`
 
+Code
+----------
+`Generate an ellipsoid <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/ellipsoidal_obj.py>`_

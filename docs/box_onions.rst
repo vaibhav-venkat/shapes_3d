@@ -96,3 +96,6 @@ with thicknesses :math:`\mathbf{T_i}` and densities :math:`\mathbf{d}`. Then, ad
 (essentially displacing the points from the origin to the center)
 to the final structure :math:`\mathbf{S}`.
 
+Code
+----------
+`Generate a cube with onions inside <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/box_onions.py>`_

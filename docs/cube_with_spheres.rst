@@ -135,3 +135,6 @@ with thicknesses :math:`\mathbf{T} = [r_j, R_j - r_j]` and densities
 (essentially displacing the points from the origin to the center)
 to the final structure :math:`\mathbf{S}`.
 
+Code
+--------
+`Generate a cube with core-corona spheres <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/box_spheres.py>`_

@@ -202,3 +202,7 @@ Examples
   A uniform sphere with patches. All have structural features :math:`R = 50`, :math:`\rho_\text{sphere}=1`,
   :math:`X = 8`, :math:`\mathbf{Y} = \{ 5000 \mid X \text{ times} \}`. They vary in patch density, in scatters per unit area, 
   with with more clustered (larger densities) towards the left.
+
+Code
+----------
+`Generate a sphere with patches <https://github.com/vaibhav-venkat/shapes_3d/blob/main/shapes_3d/objects/patchy_sphere.py>`_
