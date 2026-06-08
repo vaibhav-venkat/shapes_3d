@@ -11,7 +11,7 @@ The official shapes documentation is at the [Crease Shapes ReadTheDocs](https://
 1. **Create the Conda environment**:
 
    ```bash
-   conda env create -f environment.yml
+   conda env create -f environment.yaml
 
 2. Activate the environment
 
